@@ -1,0 +1,1 @@
+create table auto_post(post_id serial primary key, text text, created timestamp, auto_user_id int references auto_user (user_id));
