@@ -4,9 +4,6 @@ package ru.job4j.cars.repository;
 import lombok.AllArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import ru.job4j.cars.model.User;
 
 import java.util.ArrayList;
@@ -77,8 +74,8 @@ public class UserRepository {
         try (Session session = sf.openSession()) {
             try {
                 session.beginTransaction();
-                optionalUser = Optional.ofNullable(session.createQuery("from User where id = :fUserId", User.class)
-                        .setParameter("fUserId", userId).getSingleResult());
+                session.createQuery("from User where id = :fUserId", User.class)
+                        .setParameter("fUserId", userId).uniqueResultOptional();
             } catch (Exception e) {
                 session.getTransaction().rollback();
             }
@@ -106,8 +103,8 @@ public class UserRepository {
         try (Session session = sf.openSession()) {
             try {
                 session.beginTransaction();
-                optionalUser = Optional.ofNullable(session.createQuery("from User where login like :fKey", User.class)
-                        .setParameter("fKey", login).getSingleResult());
+                optionalUser = session.createQuery("from User where login like :fKey", User.class)
+                        .setParameter("fKey", login).uniqueResultOptional();
             } catch (Exception e) {
                 session.getTransaction().rollback();
             }
