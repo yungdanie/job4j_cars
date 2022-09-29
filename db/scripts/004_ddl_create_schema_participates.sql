@@ -1,5 +1,5 @@
 CREATE TABLE participates (
     id serial PRIMARY KEY,
-    item_id int not null REFERENCES items(id),
-    user_id int not null REFERENCES j_user(id)
+    user_id int not null REFERENCES auto_user(id),
+    post_id int not null REFERENCES auto_post(id)
 );
