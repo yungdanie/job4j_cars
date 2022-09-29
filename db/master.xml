@@ -8,4 +8,5 @@
     <include file="scripts/001_ddl_create_schema_auto_user.sql" relativeToChangelogFile="true"/>
     <include file="scripts/002_ddl_create_schema_post.sql" relativeToChangelogFile="true"/>
     <include file="scripts/003_ddl_create_schema_price_history.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/004_ddl_create_schema_participates.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>
