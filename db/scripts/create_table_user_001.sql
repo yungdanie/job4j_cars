@@ -1,1 +1,0 @@
-create table auto_user(user_id serial primary key , login text, password text);

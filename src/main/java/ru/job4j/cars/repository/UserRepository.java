@@ -3,112 +3,43 @@ package ru.job4j.cars.repository;
 
 import lombok.AllArgsConstructor;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import ru.job4j.cars.model.User;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @AllArgsConstructor
 public class UserRepository {
-    private final SessionFactory sf;
+    private final MainRepository repository;
 
     public User create(User user) {
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                session.save(user);
-                session.getTransaction().commit();
-            } catch (Exception e) {
-                session.getTransaction().rollback();
-            }
-        }
+        repository.tx((Consumer<Session>) session -> session.persist(user));
         return user;
     }
 
     public void update(User user) {
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                session.createQuery("update User set login = :fLogin, password = :fPassword where id = :fId")
-                        .setParameter("fLogin", user.getLogin())
-                        .setParameter("fPassword", user.getPassword())
-                        .setParameter("fId", user.getId())
-                        .executeUpdate();
-                session.getTransaction().commit();
-            } catch (Exception e) {
-                session.getTransaction().rollback();
-            }
-        }
+        repository.tx((Consumer<Session>) session -> session.merge(user));
     }
 
-    public void delete(int userId) {
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                session.createQuery("delete User where id = :fId")
-                        .setParameter("fId", userId)
-                        .executeUpdate();
-            } catch (Exception e) {
-                session.getTransaction().rollback();
-            }
-        }
+    public void delete(User user) {
+        repository.tx((Consumer<Session>) session -> session.delete(user));
     }
 
     public List<User> findAllOrderById() {
-        List<User> list = new ArrayList<>();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                list = session.createQuery("from User order by id", User.class).list();
-            } catch (Exception e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return list;
+        return repository.getList("from User order by id", User.class);
     }
 
     public Optional<User> findById(int userId) {
-        Optional<User> optionalUser= Optional.empty();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                session.createQuery("from User where id = :fUserId", User.class)
-                        .setParameter("fUserId", userId).uniqueResultOptional();
-            } catch (Exception e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return optionalUser;
+        return repository.getUniqResult("from User where id = :userId", Map.of("userId", userId), User.class);
     }
 
     public List<User> findByLikeLogin(String key) {
-        List<User> list = new ArrayList<>();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                list = session.createQuery("from User where login like :fKey", User.class)
-                        .setParameter("fKey", "%" + key + "%")
-                        .list();
-            } catch (Exception e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return list;
+        return repository.getList("from User where login like :key", Map.of("key", key), User.class);
     }
 
     public Optional<User> findByLogin(String login) {
-        Optional<User> optionalUser = Optional.empty();
-        try (Session session = sf.openSession()) {
-            try {
-                session.beginTransaction();
-                optionalUser = session.createQuery("from User where login like :fKey", User.class)
-                        .setParameter("fKey", login).uniqueResultOptional();
-            } catch (Exception e) {
-                session.getTransaction().rollback();
-            }
-        }
-        return optionalUser;
+        return repository.getUniqResult("from User where login like :key", Map.of("key", login), User.class);
     }
 }
