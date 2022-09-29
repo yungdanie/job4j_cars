@@ -1,6 +1,9 @@
 package ru.job4j.cars.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -26,6 +29,10 @@ public class PriceHistory {
 
     @Column(name = "created")
     private LocalDateTime created;
+
+    @ManyToOne
+    @JoinColumn(name = "p_user_id")
+    private Post post;
 
     @Override
     public boolean equals(Object o) {
