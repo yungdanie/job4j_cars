@@ -25,14 +25,7 @@ public class Driver {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToMany
-    @JoinTable(name = "history_owner",
-            joinColumns = {
-                    @JoinColumn(name = "car_id", nullable = false, updatable = false)},
-            inverseJoinColumns = {
-                    @JoinColumn(name = "driver_id", nullable = false, updatable = false)
-            }
-    )
+    @ManyToMany(mappedBy = "owners")
     private Set<Car> cars;
 
     @Override
