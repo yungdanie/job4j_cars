@@ -40,7 +40,6 @@ public class MainRepository {
         });
     }
 
-
     public <T> Optional<T> getUniqResult(String query, Map<String, Object> args, Class<T> tClass) {
         Function<Session, Optional<T>> command = session -> {
             var sq = session.createQuery(query, tClass);
@@ -62,8 +61,6 @@ public class MainRepository {
         };
         return tx(command);
     }
-
-
 
     public <T> List<T> getList(String query, Map<String, Object> args, Class<T> tClass) {
         Function<Session, List<T>> command = session -> {
