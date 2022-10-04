@@ -5,10 +5,8 @@ import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.Post;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @AllArgsConstructor
@@ -23,13 +21,10 @@ public class PostRepository {
     }
 
     public List<Post> getLastDay() {
-        return repository.tx(session -> {
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<Post> criteriaQuery = builder.createQuery(Post.class);
-            Root<Post> root = criteriaQuery.from(Post.class);
-            return session.createQuery(criteriaQuery.select(root).
-                    where(builder.equal(criteriaQuery.subquery(Post.class).
-                            where(builder.greatest(root.get("created"))), root.get("created")))).list();
-        });
+        return repository.getList("from Post where created = (select max(created) from Post)", Post.class);
+    }
+
+    public List<Post> like(String key) {
+        return repository.getList("from Post where text like %:key%", Map.of("key", key.toLowerCase()), Post.class);
     }
 }
