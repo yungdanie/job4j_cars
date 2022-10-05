@@ -7,6 +7,7 @@ import ru.job4j.cars.model.Post;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @AllArgsConstructor
@@ -25,6 +26,10 @@ public class PostRepository {
     }
 
     public List<Post> like(String key) {
-        return repository.getList("from Post where text like %:key%", Map.of("key", key.toLowerCase()), Post.class);
+        return repository.getList("from Post where text like :key", Map.of("key", "%" + key.toLowerCase() + "%"), Post.class);
+    }
+
+    public Optional<Post> getById(int id) {
+        return repository.getUniqResult("from Post where id = :id", Map.of("id", id), Post.class);
     }
 }

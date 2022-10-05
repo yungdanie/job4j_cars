@@ -38,10 +38,10 @@ public class UserRepository {
     }
 
     public List<User> findByLikeLogin(String key) {
-        return repository.getList("from User where login like :key", Map.of("key", key), User.class);
+        return repository.getList("from User where login like :key", Map.of("key", "%" + key.toLowerCase() + "%"), User.class);
     }
 
-    public Optional<User> findByLogin(String login) {
-        return repository.getUniqResult("from User where login like :key", Map.of("key", login), User.class);
+    public Optional<User> findByLogin(String key) {
+        return repository.getUniqResult("from User where login like :key", Map.of("key", key), User.class);
     }
 }
