@@ -29,7 +29,6 @@ public class HibernateUsageTest {
         mainRepository.tx((Function<Session, Object>) session -> session.createQuery("delete from Post").executeUpdate());
     }
 
-
     @Test
     public void truncDate() {
         Post lastPost = new Post();
