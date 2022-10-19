@@ -45,7 +45,7 @@ class PostHibernateTest {
         secondPost.setText("post_of_key");
         postRepository.save(firstPost);
         postRepository.save(secondPost);
-        Assertions.assertThat(postRepository.like(key)).isEqualTo(List.of(firstPost, secondPost));
+        Assertions.assertThat(postRepository.getByTextContains(key)).isEqualTo(List.of(firstPost, secondPost));
     }
 
     @Test

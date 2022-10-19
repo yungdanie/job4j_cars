@@ -37,7 +37,7 @@ public class PostRepository {
         });
     }
 
-    public List<Post> like(String key) {
+    public List<Post> getByTextContains(String key) {
         return repository.getList("from Post where text like :key", Map.of("key", "%" + key.toLowerCase() + "%"), Post.class);
     }
 
