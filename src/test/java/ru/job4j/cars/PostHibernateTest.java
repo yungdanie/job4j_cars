@@ -15,9 +15,11 @@ import java.util.List;
 import java.util.function.Function;
 
 class PostHibernateTest {
-    private final MainRepository mainRepository = new MainRepository(new MetadataSources(new StandardServiceRegistryBuilder()
+    private final MainRepository mainRepository = new MainRepository(new MetadataSources(
+            new StandardServiceRegistryBuilder()
             .configure().build())
-            .buildMetadata().buildSessionFactory());
+            .buildMetadata()
+            .buildSessionFactory());
     private final PostRepository postRepository = new PostRepository(mainRepository);
 
     @BeforeEach

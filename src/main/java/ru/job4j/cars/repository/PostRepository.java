@@ -5,6 +5,8 @@ import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.Post;
 
+import javax.persistence.criteria.*;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +24,17 @@ public class PostRepository {
     }
 
     public List<Post> getLastDay() {
-        return repository.getList("from Post where created = (select max(created) from Post)", Post.class);
+        return repository.tx(session -> {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Post> listQuery = cb.createQuery(Post.class);
+            Root<Post> root = listQuery.from(Post.class);
+            listQuery.select(root);
+            Subquery<LocalDate> sub = listQuery.subquery(LocalDate.class);
+            Path<LocalDate> selection = sub.from(Post.class).get("created");
+            sub.select(cb.function("TRUNC", LocalDate.class, selection)).select(cb.greatest(selection));
+            listQuery.where(cb.equal(sub, root.get("created")));
+            return session.createQuery(listQuery).list();
+        });
     }
 
     public List<Post> like(String key) {
