@@ -31,8 +31,8 @@ public class PostRepository {
             listQuery.select(root);
             Subquery<LocalDate> sub = listQuery.subquery(LocalDate.class);
             Path<LocalDate> selection = sub.from(Post.class).get("created");
-            sub.select(cb.function("TRUNC", LocalDate.class, selection)).select(cb.greatest(selection));
-            listQuery.where(cb.equal(sub, root.get("created")));
+            sub.select(cb.greatest(selection).as(LocalDate.class));
+            listQuery.where(cb.equal(sub, root.get("created").as(LocalDate.class)));
             return session.createQuery(listQuery).list();
         });
     }

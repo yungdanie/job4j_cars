@@ -32,18 +32,22 @@ public class HibernateUsageTest {
     @Test
     public void truncDate() {
         Post lastPost = new Post();
+        Post anotherLastPost = new Post();
         Post oldPost = new Post();
         Post anotherOldPost = new Post();
-        LocalDateTime dateTime = LocalDateTime.now();
-        lastPost.setText("testing");
+        LocalDateTime dateTime = LocalDateTime.of(2022, 10, 10, 10, 10);
+        lastPost.setText("testing1");
         lastPost.setCreated(dateTime);
-        oldPost.setText("old_post");
+        oldPost.setText("testing2");
         oldPost.setCreated(dateTime.minusDays(1));
-        anotherOldPost.setText("oldest");
+        anotherOldPost.setText("testing3");
         oldPost.setCreated(dateTime.minusMonths(1));
+        anotherLastPost.setText("testing4");
+        anotherLastPost.setCreated(dateTime.minusHours(1));
         postRepository.save(lastPost);
         postRepository.save(oldPost);
         postRepository.save(anotherOldPost);
+        postRepository.save(anotherLastPost);
         List<Post> list = mainRepository.tx(session -> {
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Post> listQuery = cb.createQuery(Post.class);
@@ -51,10 +55,26 @@ public class HibernateUsageTest {
             listQuery.select(root);
             Subquery<LocalDate> sub = listQuery.subquery(LocalDate.class);
             Path<LocalDate> selection = sub.from(Post.class).get("created");
-            sub.select(cb.function("TRUNC", LocalDate.class, selection)).select(cb.greatest(selection));
-            listQuery.where(cb.equal(sub, root.get("created")));
+            sub.select(cb.greatest(selection).as(LocalDate.class));
+            listQuery.where(cb.equal(sub, root.get("created").as(LocalDate.class)));
             return session.createQuery(listQuery).list();
         });
-        Assertions.assertThat(list).isEqualTo(List.of(lastPost));
+        Assertions.assertThat(list).isEqualTo(List.of(lastPost, anotherLastPost));
+    }
+
+    @Test
+    public void dateTrunc() {
+        Post post = new Post();
+        LocalDateTime dateTime = LocalDateTime.of(2022, 10, 10, 10, 10);
+        post.setCreated(dateTime);
+        postRepository.save(post);
+        List<LocalDate> list = mainRepository.tx(session -> {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<LocalDate> listQuery = cb.createQuery(LocalDate.class);
+            Root<Post> root = listQuery.from(Post.class);
+            listQuery.select(root.get("created"));
+            listQuery.select(cb.function("DATE_TRUNC", LocalDateTime.class, cb.literal("DAY"), root.get("created")).as(LocalDate.class));
+            return session.createQuery(listQuery).list();
+        });
     }
 }
