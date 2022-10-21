@@ -11,12 +11,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @AllArgsConstructor
 @Repository
 public class PostRepository {
 
     private final MainRepository repository;
+
+    public byte[] getPhoto(int id) {
+        return repository.tx(session
+                -> (byte[]) session
+                .createQuery("select photo from Post where id = :id")
+                .setParameter("id", id)
+                .getSingleResult());
+    }
+
+    public List<Post> getAll() {
+        return repository.tx((Function<Session, List<Post>>) session
+                -> session.createQuery("from Post", Post.class).list());
+    }
 
     public Post save(Post post) {
         repository.tx((Consumer<Session>) session -> session.persist(post));

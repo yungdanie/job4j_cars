@@ -1,7 +1,7 @@
 CREATE TABLE price_history(
     id SERIAL PRIMARY KEY,
-    before BIGINT not null,
-    after BIGINT not null,
+    price BIGINT,
     created TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
-    p_user_id int references auto_user(id)
+    post_id int references auto_post(id),
+    user_id int references auto_user(id)
 );

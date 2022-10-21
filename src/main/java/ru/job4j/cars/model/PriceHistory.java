@@ -29,7 +29,7 @@ public class PriceHistory {
     private LocalDateTime created;
 
     @ManyToOne
-    @JoinColumn(name = "p_user_id")
+    @JoinColumn(name = "user_id")
     private Post post;
 
     @Override
