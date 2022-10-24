@@ -18,7 +18,7 @@
 
 <nav class="navbar sticky-top navbar-expand-lg bg-dark">
     <div class="container-fluid" style="margin: 10px">
-        <a class="navbar-brand text-bold" th:href="@{/index}" style="margin-left: 10px; color: snow; font-size: xX-large">
+        <a class="navbar-brand text-bold" th:href="@{/index}" style="margin-left: 10px; color: snow; font-size: x-large">
             <i class="fa-sharp fa-solid fa-house" style="margin-right: 10px"></i>
             <b>
                 CarSale
@@ -33,7 +33,7 @@
         </div>
         <div class="navbar-nav">
             <div class="nav-item nav-link" style="margin: 5px">
-                <a class="btn btn-primary btn-light btn-sm" th:href="@{/addPost}" style="color: black; font-size: x-large">
+                <a class="btn btn-primary btn-light btn-sm" th:href="@{/addPost}" style="color: black; font-size: large">
                     Добавить объявление
                 </a>
             </div>
@@ -69,8 +69,21 @@
                                     </p>
                                 </div>
 
-                                <div class="col-xs"style="width: 300px; height: 100px" >
+                                <div class="col-xs" style="width: 300px; height: 100px">
+                                    <div class="container">
+                                        <div class="row" style="height: 50px">
+                                            <div class="col">
+                                                <p th:text="${|Цена: ${post.getPriceHistory()}|}" class="text-center" style="padding-top: 10px">
 
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="height: 50px">
+                                            <div class="col" >
+                                                <button type="button" class="btn btn-success" style="width: 100%">Купить</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </div>

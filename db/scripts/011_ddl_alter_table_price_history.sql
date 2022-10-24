@@ -1,0 +1,1 @@
+alter table price_history add column is_last bool

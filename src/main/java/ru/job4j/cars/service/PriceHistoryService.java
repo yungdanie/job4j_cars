@@ -6,18 +6,16 @@ import ru.job4j.cars.model.PriceHistory;
 import ru.job4j.cars.repository.PriceHistoryRepository;
 import ru.job4j.cars.util.NotificationUtil;
 
+import java.util.Optional;
+
 @AllArgsConstructor
 @Service
 public class PriceHistoryService {
 
-    private final PriceHistoryRepository store;
+    private final PriceHistoryRepository priceHistoryRepository;
 
-    public PriceHistory save(PriceHistory priceHistory) {
-        store.save(priceHistory);
-        if (priceHistory.getId() != 0) {
-            NotificationUtil.notifyAllUsers(priceHistory.getPost());
-        }
-        return priceHistory;
+    public Optional<PriceHistory> getLastPrice(int postId) {
+        return priceHistoryRepository.getLastPriceByPostId(postId);
     }
 
 }

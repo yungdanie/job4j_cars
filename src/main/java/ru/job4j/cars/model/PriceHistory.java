@@ -1,6 +1,9 @@
 package ru.job4j.cars.model;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OptimisticLockType;
+import org.hibernate.annotations.OptimisticLocking;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,24 +16,26 @@ import java.util.Objects;
 @NoArgsConstructor
 @Entity
 @Table(name = "price_history")
+@OptimisticLocking(type = OptimisticLockType.DIRTY)
 public class PriceHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "before")
-    private int before;
-
-    @Column(name = "after")
-    private int after;
+    @Column(name = "price")
+    private int price;
 
     @Column(name = "created")
+    @CreationTimestamp
     private LocalDateTime created;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne()
+    @JoinColumn(name = "post_id")
     private Post post;
+
+    @Column(name = "is_last")
+    private boolean isLast;
 
     @Override
     public boolean equals(Object o) {

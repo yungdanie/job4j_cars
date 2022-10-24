@@ -32,6 +32,10 @@ public class PostRepository {
                 -> session.createQuery("from Post", Post.class).list());
     }
 
+    public List<Post> getAllFetchingPriceHistory() {
+        return repository.tx((Function<Session, List<Post>>) session -> session.createQuery("from Post p left join fetch p.priceHistory", Post.class).list());
+    }
+
     public Post save(Post post) {
         repository.tx((Consumer<Session>) session -> session.persist(post));
         return post;

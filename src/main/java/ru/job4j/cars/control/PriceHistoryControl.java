@@ -14,6 +14,6 @@ public class PriceHistoryControl {
 
     @GetMapping("/calculatePriceHistory/{id}")
     public String calculatePriceHistory(@PathVariable int id) {
-        StringBuffer calculatedString = ;
+        return "";
     }
 }

@@ -38,4 +38,8 @@ public class PostService {
     public List<Post> getAll() {
         return postRepository.getAll();
     }
+
+    public List<Post> getAllFetchingPriceHistory() {
+        return postRepository.getAllFetchingPriceHistory();
+    }
 }
