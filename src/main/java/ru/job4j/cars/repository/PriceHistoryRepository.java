@@ -1,30 +1,23 @@
 package ru.job4j.cars.repository;
 
 import lombok.AllArgsConstructor;
-import org.hibernate.LockOptions;
-import org.hibernate.Session;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import ru.job4j.cars.model.Post;
 import ru.job4j.cars.model.PriceHistory;
 
 import javax.persistence.OptimisticLockException;
-import javax.persistence.criteria.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 @Repository
 @AllArgsConstructor
 public class PriceHistoryRepository {
 
     private final MainRepository repository;
-    private final Logger logger;
+    private final static Logger LOGGER = LoggerFactory.getLogger(PriceHistoryRepository.class);
 
     public PriceHistory save(PriceHistory priceHistory) {
         priceHistory.setLast(true);
@@ -39,12 +32,13 @@ public class PriceHistoryRepository {
                 session.persist(priceHistory);
             } catch (OptimisticLockException e) {
                 session.close();
-                logger.debug("Optimistic Lock Exception", e);
+                LOGGER.debug("Optimistic Lock Exception", e);
                 priceHistory.setLast(false);
             }
         });
         return priceHistory;
     }
+
     public Optional<PriceHistory> getLastPriceByPostId(int postId) {
         return repository.tx(session -> {
             CriteriaBuilder cb = session.getCriteriaBuilder();

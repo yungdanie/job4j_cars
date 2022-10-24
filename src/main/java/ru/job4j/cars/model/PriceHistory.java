@@ -2,6 +2,7 @@ package ru.job4j.cars.model;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OptimisticLockType;
 import org.hibernate.annotations.OptimisticLocking;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "price_history")
 @OptimisticLocking(type = OptimisticLockType.DIRTY)
+@DynamicUpdate(value = true)
 public class PriceHistory {
 
     @Id
@@ -30,7 +32,7 @@ public class PriceHistory {
     @CreationTimestamp
     private LocalDateTime created;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 

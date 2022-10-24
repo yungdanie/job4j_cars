@@ -6,10 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
@@ -48,6 +47,17 @@ public class Post {
     @JoinTable(name = "participates", joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "post_id")})
     private Set<User> participates;
+
+    public Integer getLastPrice() {
+        Integer rsl = null;
+        if (priceHistory != null) {
+            Optional<PriceHistory> historyOptional = priceHistory.stream().filter(PriceHistory::isLast).findFirst();
+            if (historyOptional.isPresent()) {
+                rsl = historyOptional.get().getPrice();
+            }
+        }
+        return rsl;
+    }
 
     @Override
     public boolean equals(Object o) {

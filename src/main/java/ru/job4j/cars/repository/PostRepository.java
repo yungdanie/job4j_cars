@@ -19,21 +19,26 @@ public class PostRepository {
 
     private final MainRepository repository;
 
-    public byte[] getPhoto(int id) {
-        return repository.tx(session
-                -> (byte[]) session
+    public Optional<byte[]> getPhoto(int id) {
+        return repository.tx((Function<Session, Optional<byte[]>>) session
+                -> session
                 .createQuery("select photo from Post where id = :id")
                 .setParameter("id", id)
-                .getSingleResult());
+                .uniqueResultOptional());
     }
 
     public List<Post> getAll() {
         return repository.tx((Function<Session, List<Post>>) session
                 -> session.createQuery("from Post", Post.class).list());
     }
+    
+    public List<Post> getAllFetching() {
+        return repository.tx((Function<Session, List<Post>>) session
+                -> session.createQuery("from Post p left join fetch p.priceHistory", Post.class).list());
+    }
 
-    public List<Post> getAllFetchingPriceHistory() {
-        return repository.tx((Function<Session, List<Post>>) session -> session.createQuery("from Post p left join fetch p.priceHistory", Post.class).list());
+    public List<Post> getAllFetchPriceHAndParticipates() {
+        return repository.tx((Function<Session, List<Post>>) session -> session.createQuery("from Post p left join fetch p.priceHistory left join fetch p.participates", Post.class).list());
     }
 
     public Post save(Post post) {

@@ -2,6 +2,7 @@ package ru.job4j.cars.service;
 
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.job4j.cars.model.Post;
 import ru.job4j.cars.repository.PostRepository;
@@ -18,28 +19,29 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final Logger logger;
-    private static final int defaultImageSizeBytes = 13000;
+    private final static Logger LOGGER = LoggerFactory.getLogger(PostService.class);
+    private static final int DEFAULT_IMAGE_SIZE_BYTES = 13000;
 
     public byte[] getPhoto(int id) {
         var bytes = postRepository.getPhoto(id);
-        if (bytes == null) {
-            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(defaultImageSizeBytes)) {
+        if (bytes.isEmpty()) {
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(DEFAULT_IMAGE_SIZE_BYTES)) {
                 BufferedImage bufferedImage = ImageIO.read(new File("./src/main/resources/img/defaultPostPhoto.png"));
                 ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
                 return byteArrayOutputStream.toByteArray();
             } catch (IOException e) {
+                LOGGER.error("Failed to get photo", e);
                 throw new RuntimeException(e);
             }
         }
-        return postRepository.getPhoto(id);
+        return bytes.get();
     }
 
     public List<Post> getAll() {
         return postRepository.getAll();
     }
 
-    public List<Post> getAllFetchingPriceHistory() {
-        return postRepository.getAllFetchingPriceHistory();
+    public List<Post> getAllFetchPriceHAndParticipates() {
+        return postRepository.getAllFetchPriceHAndParticipates();
     }
 }

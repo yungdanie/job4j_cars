@@ -32,5 +32,4 @@ public class PostControl {
                 .body(new ByteArrayResource(photo));
     }
 
-
 }
