@@ -12,7 +12,6 @@ import ru.job4j.cars.repository.MainRepository;
 import ru.job4j.cars.repository.PostRepository;
 import ru.job4j.cars.repository.PriceHistoryRepository;
 
-import java.util.Set;
 import java.util.function.Function;
 
 public class PriceHistoryTest {
@@ -42,9 +41,9 @@ public class PriceHistoryTest {
         postRepository.save(post);
         oldPrice.setPost(post);
         newPrice.setPost(post);
-        priceHistoryRepository.save(oldPrice);
-        priceHistoryRepository.save(newPrice);
-        Assertions.assertThat(priceHistoryRepository.getPriceByPostId(post.getId())).isEqualTo(newPrice);
+        priceHistoryRepository.saveAndSetLast(oldPrice);
+        priceHistoryRepository.saveAndSetLast(newPrice);
+        Assertions.assertThat(priceHistoryRepository.getLastPriceByPostId(post.getId()).get()).isEqualTo(newPrice);
     }
 
 }

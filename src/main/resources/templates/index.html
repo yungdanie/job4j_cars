@@ -64,25 +64,45 @@
                             </p>
                         </div>
 
-                        <div class="border" style="height: 100px; margin-top: 30px; word-wrap: break-word; width: 100%;">
-                            <div class="row">
+                        <div class="col" style="height: 100px; margin-top: 30px; word-wrap: break-word; width: 100%;">
 
-                                <div class="border" style="width: 70%; padding: 5px 20px;">
-                                    <p th:utext="|Владелец ${post.getUser().getLogin()}|">
-                                    </p>
+                            <div class="row">
+                                <div class="border" style="height: 106px; width: 70%; padding: 5px 20px; text-align: center">
+                                    <div class="row">
+                                        <div class="border" style="width: 50%; margin: 5px 5px">
+                                            <p th:utext="|Владелец: ${post.getUser().getLogin()}|">
+                                                Владелец:
+                                            </p>
+                                        </div>
+                                        <div class="border" style="width: 47%; margin: 5px 0;">
+                                            <p th:utext="|Кол-во владельцев: ${post.getParticipates().size()}|">
+                                                Кол-во владельцев:
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="border" style="display: block; margin: 0 auto; width: 95%">
+                                            <p th:utext="|Дата размещения : ${#temporals.format(post.getCreated(), 'dd-MM-yyyy HH:mm')}|">
+                                                Дата размещения:
+                                            </p>
+                                        </div>
+                                    </div>
+
                                 </div>
 
-                                <div class="col-xs" style="width: 30%; height: 100px">
-                                    <div class="container">
-                                        <div class="row" style="height: 50px">
+                                <div class="col-xs" style="width: 30%; height: auto">
+                                    <div class="border" style="height: 100%">
+                                        <div class="row" style="height: auto">
                                             <div class="col">
                                                 <p th:text="|Цена: ${post.getLastPrice()} руб|" class="text-center" style="padding-top: 10px">
+                                                    dd
                                                 </p>
                                             </div>
                                         </div>
-                                        <div class="row" style="height: 50px; padding: 5px 5px">
-                                            <div class="col" >
-                                                <button type="button" class="btn btn-success" style="width: 100%">Купить</button>
+                                        <div class="row" style="height: auto; padding-bottom: 10px ">
+                                            <div class="col-xs" >
+                                                <button type="button" class="btn btn-success" style="display: block; margin: 0 auto; width: 60%">Купить</button>
                                             </div>
                                         </div>
                                     </div>
