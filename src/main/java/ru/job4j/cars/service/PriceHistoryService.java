@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.job4j.cars.model.PriceHistory;
 import ru.job4j.cars.repository.PriceHistoryRepository;
-import ru.job4j.cars.util.NotificationUtil;
 
 import java.util.Optional;
 

@@ -17,6 +17,11 @@ public class PostControl {
 
     private final PostService postService;
 
+    @GetMapping("/addPost")
+    public String addPost() {
+        return "addPost";
+    }
+
     @GetMapping("/allPosts")
     public String allPost() {
         return "allPosts";

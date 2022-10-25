@@ -48,7 +48,6 @@ public class Post {
             inverseJoinColumns = {@JoinColumn(name = "post_id")})
     private Set<User> participates;
 
-
     public Integer getLastPrice() {
         Integer rsl = null;
         if (priceHistory != null) {

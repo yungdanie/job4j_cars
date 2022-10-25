@@ -15,16 +15,21 @@
   <title>Добавление объявления</title>
 
   <script>
-    function getDate() {
-      var date = new Date();
-      var year = date.getFullYear();
-      var month = date.getMonth();
-      var day = date.getDay();
-      var hours = date.getHours();
-      var minutes = date.getMinutes();
-      document.getElementById("post_time").value = year + '-' + month + '-' + day ;
-    }
+      window.addEventListener('load', function getDate() {
+          const d = new Date();
+          const year = d.getFullYear();
+          let day = d.getDate();
+          if (day<10) day='0' + day;
+          let month = d.getMonth() + 1;
+          if (month<10) month='0' + month;
+          let hours = d.getHours();
+          if (hours < 10) hours = '0' + hours;
+          let minutes = d.getMinutes();
+          if (minutes < 10) minutes = '0' + minutes;
+          document.getElementById("curr_time").value = year + "-" + month + "-" + day + " " + hours + ":" + minutes;
+      }, false);
   </script>
+
 </head>
 <body>
 
@@ -62,19 +67,19 @@
     </div>
 
     <div class="card-body">
-      <form th:action="@{/addForm}" method="POST" id="post" name="post">
+      <form th:action="@{/addForm}" method="POST" id="post" name="post" enctype="multipart/form-data">
         <form th:action="@{/addPriceHistory}" method="POST" id="price_history">
 
-          <div class="row">
+          <div class="row" style="padding-top: 1%; padding-bottom: 1%">
             <div class="col">
               <div class="input-group">
                 <label for="post_name" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Название объявления:</label>
-                <input type="text" class="form-control" id="post_name" form="post" name="post_name" placeholder="BMW X6 2015 года.. ">
+                <input type="text" class="form-control" id="post_name" form="post" name="post_name" placeholder="BMW X6 2015 года..">
               </div>
             </div>
           </div>
 
-          <div class="row">
+          <div class="row" style="padding-top: 1%; padding-bottom: 1%">
             <div class="col">
               <div class="input-group">
                 <label for="price" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Стоимость:</label>
@@ -84,24 +89,43 @@
             </div>
           </div>
 
-          <div class="row">
+          <div class="row" style="padding-top: 1%; padding-bottom: 1%">
             <div class="col">
               <div class="input-group">
                 <label for="post_text" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Описание:</label>
-                <textarea class="form-control" wrap="soft" rows="6" id="post_text" name="post_text" form="post" placeholder="Пробег/Двигатель/Изъяны/Повреждения.. ">
-                </textarea>
+                <textarea class="form-control" wrap="soft" rows="6" id="post_text" name="post_text" form="post" placeholder="Пробег/Двигатель/Изъяны/Повреждения.. "></textarea>
               </div>
             </div>
           </div>
 
-          <div class="row">
+          <div class="row" style="padding-top: 1%; padding-bottom: 1%">
             <div class="col">
               <div class="input-group">
-                <label for="post_time" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Время создания:</label>
-                <input class="form-control" value="" id="post_time" name="post_time" type="datetime-local" disabled="disabled">
+                <label for="curr_time" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Время создания:</label>
+                <input class="form-control"  id="curr_time" name="curr_time" type="datetime-local" disabled="disabled">
               </div>
             </div>
           </div>
+
+          <div class="row" style="padding-top: 1%; padding-bottom: 1%">
+              <div class="col">
+                  <div class="input-group">
+                      <label for="input_photo" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Фотографии:</label>
+                      <input type="file" form="post" class="form-control" id="input_photo" name="input_photo">
+                  </div>
+              </div>
+          </div>
+
+          <div class="row" style="padding-top: 1%; padding-bottom: 1%">
+              <div class="col">
+                  <div class="input-group">
+                      <label for="input_photo" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Текущий владелец:</label>
+                      <span class="input-group-text">Пользователь</span>
+                      <input type="text" class="form-control" th:value="${logUser.getLogin()}" disabled>
+                  </div>
+              </div>
+          </div>
+
         </form>
       </form>
 

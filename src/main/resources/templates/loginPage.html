@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title>Авторизация</title>
+</head>
+<body>
+
+<nav class="navbar sticky-top navbar-expand-lg bg-dark">
+    <div class="container-fluid" style="margin: 10px">
+        <a class="navbar-brand text-bold" th:href="@{/index}" style="margin-left: 10px; color: snow; font-size: x-large">
+            <i class="fa-sharp fa-solid fa-house" style="margin-right: 10px"></i>
+            <b>
+                CarSale
+            </b>
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <i class="fa-solid fa-house"></i>
+                </li>
+            </ul>
+        </div>
+        <div class="navbar-nav">
+            <div class="nav-item nav-link" style="margin: 5px">
+                <a class="btn btn-primary btn-light btn-sm" th:href="@{/addPost}" style="color: black; font-size: large">
+                    Добавить объявление
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card" style="margin: 15% 30%;">
+        <div class="card-header" style="text-align: center">
+            <b>
+                Авторизация пользователя
+            </b>
+        </div>
+
+
+        <form th:action="@{/addUser}" method="POST" id="login_form" name="login_form">
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Email" id="login" name="login" style="margin: 1% auto">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Пароль" id="password" name="password" style="margin: 1% auto">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group" >
+                            <button class="btn btn-dark" type="submit" form="login_form" style="margin: 1% auto">
+                                Создать аккаунт
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+<p class="mt-5 mb-3 text-muted fixed-bottom text-center">&copy; Daniel Kocheshkov 2022</p>
+</body>
+</html>
