@@ -9,4 +9,5 @@ public class authUserUtil {
     public static User getUser(HttpSession httpSession) {
         return (User) httpSession.getAttribute("user");
     }
+
 }

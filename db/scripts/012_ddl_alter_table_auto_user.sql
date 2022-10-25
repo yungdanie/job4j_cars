@@ -1,0 +1,1 @@
+alter table auto_user add column uuid varchar[36];

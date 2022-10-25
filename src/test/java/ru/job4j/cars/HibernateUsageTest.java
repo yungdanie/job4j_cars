@@ -7,6 +7,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.job4j.cars.model.Post;
+import ru.job4j.cars.model.User;
 import ru.job4j.cars.repository.MainRepository;
 import ru.job4j.cars.repository.PostRepository;
 
@@ -14,6 +15,8 @@ import javax.persistence.criteria.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class HibernateUsageTest {
@@ -27,6 +30,7 @@ public class HibernateUsageTest {
     @BeforeEach
     public void clearDataBase() {
         mainRepository.tx((Function<Session, Object>) session -> session.createQuery("delete from Post").executeUpdate());
+        mainRepository.tx((Function<Session, Object>) session -> session.createQuery("delete from User").executeUpdate());
     }
 
     @Test
@@ -63,18 +67,14 @@ public class HibernateUsageTest {
     }
 
     @Test
-    public void dateTrunc() {
-        Post post = new Post();
-        LocalDateTime dateTime = LocalDateTime.of(2022, 10, 10, 10, 10);
-        post.setCreated(dateTime);
-        postRepository.save(post);
-        List<LocalDate> list = mainRepository.tx(session -> {
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<LocalDate> listQuery = cb.createQuery(LocalDate.class);
-            Root<Post> root = listQuery.from(Post.class);
-            listQuery.select(root.get("created"));
-            listQuery.select(cb.function("DATE_TRUNC", LocalDateTime.class, cb.literal("DAY"), root.get("created")).as(LocalDate.class));
-            return session.createQuery(listQuery).list();
-        });
+    public void customArrayTypeTest() {
+        User user = new User();
+        user.setLogin("login");
+        user.setPassword("password");
+        UUID firstID = UUID.randomUUID();
+        UUID secondID = UUID.randomUUID();
+        user.setUuid(new UUID[] {firstID, secondID});
+        mainRepository.tx((Consumer<Session>) session -> session.persist(user));
+        Assertions.assertThat(user.getUuid()).isEqualTo(new UUID[] {firstID, secondID});
     }
 }

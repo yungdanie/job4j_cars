@@ -1,9 +1,13 @@
 package ru.job4j.cars.model;
 
 import lombok.*;
+import org.hibernate.annotations.Type;
+import ru.job4j.cars.repository.types.custom.StringArrayCustomType;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -23,6 +27,11 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "uuid")
+    @Type(type = "ru.job4j.cars.repository.types.custom.StringArrayCustomType.class")
+    private UUID[] uuid;
+
 
     public User(String login, String password) {
         this.login = login;

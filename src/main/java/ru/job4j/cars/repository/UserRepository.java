@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @AllArgsConstructor
 @Repository
@@ -19,6 +20,12 @@ public class UserRepository {
     public User create(User user) {
         repository.tx((Consumer<Session>) session -> session.persist(user));
         return user;
+    }
+
+    public Optional<User> authentication(User user) {
+        return repository.getUniqResult("from User where login = :login and password = :password",
+                Map.of("login", user.getLogin(), "password", user.getPassword()),
+                User.class);
     }
 
     public void update(User user) {
