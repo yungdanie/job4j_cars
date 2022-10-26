@@ -1,35 +1,32 @@
 package ru.job4j.cars.repository.types.custom;
 
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserType;
 
 import java.io.Serializable;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
-public class StringArrayCustomType implements UserType {
+public class UUIDCustomType implements UserType {
 
-    private static final int[] SQL_ARRAY_TYPE = new int[] {Types.ARRAY};
+    private static final int[] SQL_TYPE = new int[] {Types.VARCHAR};
 
     @Override
     public int[] sqlTypes() {
-        return SQL_ARRAY_TYPE;
+        return SQL_TYPE;
     }
 
     @Override
     public Class returnedClass() {
-        return UUID[].class;
+        return UUID.class;
     }
 
     @Override
     public boolean equals(Object o, Object o1) throws HibernateException {
-        UUID[] array = (UUID[]) o;
-        UUID[] array1 = (UUID[]) o1;
-        return Arrays.equals(array, array1);
+        UUID uuid1 = (UUID) o;
+        UUID uuid2 = (UUID) o1;
+        return Objects.equals(uuid1, uuid2);
     }
 
     @Override
@@ -39,30 +36,22 @@ public class StringArrayCustomType implements UserType {
 
     @Override
     public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor sharedSessionContractImplementor, Object owner) throws HibernateException, SQLException {
-        Array array = rs.getArray(names[0]);
-        UUID[] resultArray = null;
-        if (array != null) {
-            String[] stringArray = (String[]) array.getArray();
-            resultArray = new UUID[stringArray.length];
-            for (int i = 0; i < stringArray.length; i++) {
-                resultArray[i] = UUID.fromString(stringArray[i]);
-            }
+        String result = rs.getString(names[0]);
+        UUID uuid = null;
+        if (result != null) {
+            uuid = UUID.fromString(result);
         }
-        return resultArray;
+        return uuid;
     }
 
     @Override
     public void nullSafeSet(PreparedStatement ps, Object value, int index, SharedSessionContractImplementor session) throws HibernateException, SQLException {
         if (Objects.isNull(value)) {
-            ps.setNull(index, Types.ARRAY);
+            ps.setNull(index, Types.VARCHAR);
         } else {
-            UUID[] uuidArray = (UUID[]) value;
-            String[] stringArray = new String[uuidArray.length];
-            for (int i = 0; i < uuidArray.length; i++) {
-                stringArray[i] = uuidArray[i].toString();
-            }
-            Array sqlArray = ps.getConnection().createArrayOf("VARCHAR", stringArray);
-            ps.setArray(index, sqlArray);
+            UUID uuid = (UUID) value;
+            String result = uuid.toString();
+            ps.setString(index, result);
         }
     }
 

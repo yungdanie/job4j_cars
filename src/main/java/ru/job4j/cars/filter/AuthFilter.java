@@ -1,8 +1,10 @@
 package ru.job4j.cars.filter;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.job4j.cars.model.User;
-import ru.job4j.cars.util.authUserUtil;
+import ru.job4j.cars.service.UserService;
+import ru.job4j.cars.util.AuthUserUtil;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
@@ -12,34 +14,38 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
+
+import static ru.job4j.cars.util.AuthUserUtil.setUserGuest;
 
 @Component
-public class authFilter implements Filter {
+@AllArgsConstructor
+public class AuthFilter implements Filter {
 
-    private final static String NO_USER_REDIRECT = "login";
+    private final UserService userService;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse res = (HttpServletResponse) servletResponse;
         HttpSession session = req.getSession();
-        User user = authUserUtil.getUser(session);
         Cookie[] cookies = req.getCookies();
+        User user = AuthUserUtil.getUser(session);
         Optional<Cookie> cookieOptional = Arrays
                 .stream(cookies)
                 .filter(cookie -> cookie.getName().equals("user_uuid"))
                 .findFirst();
         if (user == null) {
-            User newUser = new User();
-            newUser.setUuid(new UUID[] {UUID.randomUUID()});
-            req.getSession().setAttribute("actual_user", newUser);
-        } else {
-            if (cookieOptional.isPresent() && cookieOptional.get().getValue().equals(user.getUuid().toString())) {
-
+            if (cookieOptional.isPresent()) {
+                Optional<User> loadUser = userService.getUserByCookie(cookieOptional.get());
+                if (loadUser.isPresent()) {
+                    session.setAttribute("actual_user", loadUser.get());
+                } else {
+                    setUserGuest(session);
+                }
+            } else {
+                setUserGuest(session);
             }
         }
-
         filterChain.doFilter(servletRequest, servletResponse);
     }
 

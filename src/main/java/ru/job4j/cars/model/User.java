@@ -1,17 +1,16 @@
 package ru.job4j.cars.model;
 
-import lombok.*;
-import org.hibernate.annotations.Type;
-import ru.job4j.cars.repository.types.custom.StringArrayCustomType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.Set;
 
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -28,10 +27,11 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "uuid")
-    @Type(type = "ru.job4j.cars.repository.types.custom.StringArrayCustomType.class")
-    private UUID[] uuid;
-
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_uuid",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "uuid_id"))
+    private Set<UuidEntity> uuids;
 
     public User(String login, String password) {
         this.login = login;

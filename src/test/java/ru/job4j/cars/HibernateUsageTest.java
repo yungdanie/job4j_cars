@@ -8,13 +8,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.job4j.cars.model.Post;
 import ru.job4j.cars.model.User;
+import ru.job4j.cars.model.UuidEntity;
 import ru.job4j.cars.repository.MainRepository;
 import ru.job4j.cars.repository.PostRepository;
+import ru.job4j.cars.repository.UserRepository;
 
 import javax.persistence.criteria.*;
+import javax.servlet.http.Cookie;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -27,6 +32,8 @@ public class HibernateUsageTest {
 
     private final PostRepository postRepository = new PostRepository(mainRepository);
 
+    private final UserRepository userRepository = new UserRepository(mainRepository);
+
     @BeforeEach
     public void clearDataBase() {
         mainRepository.tx((Function<Session, Object>) session -> session.createQuery("delete from Post").executeUpdate());
@@ -34,7 +41,7 @@ public class HibernateUsageTest {
     }
 
     @Test
-    public void truncDate() {
+    public void whenTruncDate() {
         Post lastPost = new Post();
         Post anotherLastPost = new Post();
         Post oldPost = new Post();
@@ -67,14 +74,36 @@ public class HibernateUsageTest {
     }
 
     @Test
-    public void customArrayTypeTest() {
+    public void createCustomArrayType() {
+        User user = new User();
+        user.setLogin("login");
+        user.setPassword("password");
+        UUID firstID = UUID.randomUUID();
+        UuidEntity uuidEntity = new UuidEntity();
+        uuidEntity.setUuid(firstID);
+        user.setUuids(Set.of(uuidEntity));
+        mainRepository.tx((Consumer<Session>) session -> session.persist(user));
+        User loadUser = mainRepository.tx((Function<Session, User>) session -> session.get(User.class, user.getId()));
+        Assertions.assertThat(user).isEqualTo(loadUser);
+    }
+
+    @Test
+    public void mergeCustomArrayType() {
         User user = new User();
         user.setLogin("login");
         user.setPassword("password");
         UUID firstID = UUID.randomUUID();
         UUID secondID = UUID.randomUUID();
-        user.setUuid(new UUID[] {firstID, secondID});
+    }
+
+    @Test
+    public void getUserByCookie() {
+        User user = new User();
+        user.setLogin("login");
+        user.setPassword("password");
+        UUID firstID = UUID.randomUUID();
         mainRepository.tx((Consumer<Session>) session -> session.persist(user));
-        Assertions.assertThat(user.getUuid()).isEqualTo(new UUID[] {firstID, secondID});
+        Optional<User> loadUser = userRepository.getUserByCookie(new Cookie("user_uuid", firstID.toString()));
+        Assertions.assertThat(loadUser.get()).isEqualTo(user);
     }
 }

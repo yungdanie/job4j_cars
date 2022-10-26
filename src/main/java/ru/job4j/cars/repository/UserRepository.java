@@ -6,16 +6,37 @@ import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.User;
 
+import javax.persistence.criteria.*;
+import javax.servlet.http.Cookie;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @AllArgsConstructor
 @Repository
 public class UserRepository {
     private final MainRepository repository;
+
+    public void mergeUser(User user) {
+        repository.tx((Consumer<Session>) session -> session.merge(user));
+    }
+
+    public Optional<User> getUserByCookie(Cookie cookie) {
+        if (!cookie.getName().equals("user_uuid")) {
+            throw new IllegalArgumentException();
+        }
+        return repository.tx(session -> {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<User> userCriteriaQuery = cb.createQuery(User.class);
+            Root<User> root = userCriteriaQuery.from(User.class);
+            userCriteriaQuery.select(root);
+            Path<Object> path = root.get("uuid");
+            CriteriaBuilder.In<Object> in = cb.in(path);
+            in.value(cookie.getValue());
+            return session.createQuery(userCriteriaQuery).uniqueResultOptional();
+        });
+    }
 
     public User create(User user) {
         repository.tx((Consumer<Session>) session -> session.persist(user));
@@ -23,7 +44,7 @@ public class UserRepository {
     }
 
     public Optional<User> authentication(User user) {
-        return repository.getUniqResult("from User where login = :login and password = :password",
+        return repository.getUniqResult("from User u left join fetch u.uuids where login = :login and password = :password",
                 Map.of("login", user.getLogin(), "password", user.getPassword()),
                 User.class);
     }
