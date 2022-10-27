@@ -5,7 +5,11 @@ import javax.servlet.http.HttpServletResponse;
 
 public class CookieUtil {
 
-    public static void addCookie(String cookieName, String value, HttpServletResponse res) {
-        res.addCookie(new Cookie(cookieName, value));
+    public static void setCookie(HttpServletResponse response, String key, String value, int expiry) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(expiry);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 }

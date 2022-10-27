@@ -45,24 +45,24 @@
     <div class="card" style="margin: 10% 30%;">
         <div class="card-header" style="text-align: center">
             <b>
-                Авторизация пользователя
+                Регистрация пользователя
             </b>
         </div>
 
-
-        <form th:action="@{/addUser}" method="POST" id="login_form" name="login_form">
+        <form th:action="@{/regUser}" method="POST" id="reg_form" name="reg_form">
 
             <div class="card-body">
-                <div th:if="${fail_login}" class="alert alert-danger" role="alert" style="text-align: center">
-                    Логин или пароль введены не верно!
+
+                <div th:if="${fail_reg}" class="alert alert-danger" role="alert" style="text-align: center">
+                    Пользователь с указанным логином уже существует!
                 </div>
 
                 <div class="row">
                     <div class="col">
                         <div class="input-group has-validation">
-                            <input type="text" form="login_form" class="form-control is-invalid" placeholder="Логин" id="login" name="login" style="margin: auto" required>
+                            <input type="text" form="reg_form" class="form-control is-invalid" placeholder="Логин" id="login" name="login" style="margin: auto" required>
                             <div id="email_validation" class="invalid-feedback" style="margin: 0px">
-                                Укажите свой логин
+                                Укажите логин
                             </div>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                 <div class="row">
                     <div class="col">
                         <div class="input-group has-validation">
-                            <input type="text" form="login_form" class="form-control is-invalid" placeholder="Пароль" id="password" name="password" style="margin: 1% auto" required>
+                            <input type="text" form="reg_form" class="form-control is-invalid" placeholder="Пароль" id="password" name="password" style="margin: 1% auto" required>
                             <div id="password_validation" class="invalid-feedback" style="margin: 0px">
                                 Укажите пароль
                             </div>
@@ -82,8 +82,8 @@
                 <div class="row">
                     <div class="col">
                         <div class="input-group" >
-                            <button class="btn btn-dark" type="submit" form="login_form" style="margin: 1% auto; width: 50%">
-                                Войти
+                            <button class="btn btn-dark" type="submit" form="reg_form" style="margin: 1% auto; width: 50%">
+                                Создать аккаунт
                             </button>
                         </div>
                     </div>

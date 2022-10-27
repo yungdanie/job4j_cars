@@ -18,6 +18,13 @@ import java.util.function.Consumer;
 public class UserRepository {
     private final MainRepository repository;
 
+    public boolean checkAuth(User user) {
+        return repository.
+                getUniqResult("from User where login = :login",
+                        Map.of("login", user.getLogin()),
+                        User.class).
+                isPresent();
+    }
     public void mergeUser(User user) {
         repository.tx((Consumer<Session>) session -> session.merge(user));
     }

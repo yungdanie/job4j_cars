@@ -14,6 +14,10 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    public boolean checkAuth(User user) {
+        return userRepository.checkAuth(user);
+    }
+
     public Optional<User> getUserByCookie(Cookie cookie) {
         return userRepository.getUserByCookie(cookie);
     }
