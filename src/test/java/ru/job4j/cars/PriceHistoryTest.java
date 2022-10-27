@@ -4,6 +4,8 @@ import org.assertj.core.api.Assertions;
 import org.hibernate.Session;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.job4j.cars.model.Post;
@@ -25,6 +27,7 @@ public class PriceHistoryTest {
     private final PostRepository postRepository = new PostRepository(mainRepository);
 
     @BeforeEach
+    @AfterEach
     public void clearDataBase() {
         mainRepository.tx((Function<Session, Object>) session -> session.createQuery("delete from PriceHistory").executeUpdate());
         mainRepository.tx((Function<Session, Object>) session -> session.createQuery("delete from Post").executeUpdate());
