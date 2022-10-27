@@ -25,6 +25,7 @@ public class UserRepository {
                         User.class).
                 isPresent();
     }
+
     public void mergeUser(User user) {
         repository.tx((Consumer<Session>) session -> session.merge(user));
     }

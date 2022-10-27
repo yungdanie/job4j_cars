@@ -19,6 +19,16 @@ public class PostRepository {
 
     private final MainRepository repository;
 
+    public List<Post> getAllWithNoEmptyPhoto() {
+        return repository.tx(session -> {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Post> criteriaQuery = cb.createQuery(Post.class);
+            Root<Post> root = criteriaQuery.from(Post.class);
+            criteriaQuery.select(root).where(cb.isNotNull(root.get("photo")));
+            return session.createQuery(criteriaQuery).list();
+        });
+    }
+
     public Optional<byte[]> getPhoto(int id) {
         return repository.tx((Function<Session, Optional<byte[]>>) session
                 -> session
