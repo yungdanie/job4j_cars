@@ -5,12 +5,14 @@ import lombok.AllArgsConstructor;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import ru.job4j.cars.model.User;
+import ru.job4j.cars.model.UuidEntity;
 
 import javax.persistence.criteria.*;
 import javax.servlet.http.Cookie;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 @AllArgsConstructor
@@ -32,18 +34,22 @@ public class UserRepository {
 
     public Optional<User> getUserByCookie(Cookie cookie) {
         if (!cookie.getName().equals("user_uuid")) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Cookie that used to get User has wrong name");
         }
-        return repository.tx(session -> {
+        Optional<User> result = repository.tx(session -> {
             CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<User> userCriteriaQuery = cb.createQuery(User.class);
-            Root<User> root = userCriteriaQuery.from(User.class);
-            userCriteriaQuery.select(root);
-            Path<Object> path = root.get("uuid");
-            CriteriaBuilder.In<Object> in = cb.in(path);
-            in.value(cookie.getValue());
-            return session.createQuery(userCriteriaQuery).uniqueResultOptional();
+            CriteriaQuery<User> uuidCriteriaQuery = cb.createQuery(User.class);
+            Root<User> userRoot = uuidCriteriaQuery.from(User.class);
+            Subquery<Integer> subQuery = uuidCriteriaQuery.subquery(Integer.class);
+            Root<User> subUserRoot = subQuery.from(User.class);
+            Join<User, UuidEntity> subQueryJoin = subUserRoot.join("uuids");
+            subQuery.select(subUserRoot.get("id")).where(
+                    cb.equal(subQueryJoin.get("uuid"), UUID.fromString(cookie.getValue()))
+            );
+            uuidCriteriaQuery.where(cb.in(userRoot.get("id")).value(subQuery));
+            return session.createQuery(uuidCriteriaQuery).uniqueResultOptional();
         });
+        return result;
     }
 
     public User create(User user) {

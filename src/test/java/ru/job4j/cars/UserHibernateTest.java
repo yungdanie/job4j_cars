@@ -98,9 +98,15 @@ public class UserHibernateTest {
     @Test
     public void getUserByCookie() {
         User user = new User();
-        user.setLogin("login");
-        user.setPassword("password");
+        User fakeUser = new User();
         UUID firstID = UUID.randomUUID();
+        UUID secondID = UUID.randomUUID();
+        UuidEntity firstUuidEntity = new UuidEntity();
+        UuidEntity secondUuidEntity = new UuidEntity();
+        secondUuidEntity.setUuid(secondID);
+        firstUuidEntity.setUuid(firstID);
+        user.setUuids(Set.of(firstUuidEntity));
+        fakeUser.setUuids(Set.of(secondUuidEntity));
         mainRepository.tx((Consumer<Session>) session -> session.persist(user));
         Optional<User> loadUser = userRepository.getUserByCookie(new Cookie("user_uuid", firstID.toString()));
         Assertions.assertThat(loadUser.get()).isEqualTo(user);
