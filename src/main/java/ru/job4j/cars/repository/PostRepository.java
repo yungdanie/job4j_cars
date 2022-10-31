@@ -48,7 +48,11 @@ public class PostRepository {
     }
 
     public List<Post> getAllFetchPriceHAndParticipates() {
-        return repository.tx((Function<Session, List<Post>>) session -> session.createQuery("from Post p left join fetch p.priceHistory left join fetch p.participates left join fetch p.user", Post.class).list());
+        return repository.tx((Function<Session, List<Post>>) session ->
+                session.createQuery("from Post p " +
+                        "left join fetch p.priceHistory " +
+                        "left join fetch p.participates " +
+                        "left join fetch p.user", Post.class).list());
     }
 
     public Post save(Post post) {
