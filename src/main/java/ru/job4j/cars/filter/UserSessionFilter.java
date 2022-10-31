@@ -19,7 +19,7 @@ import static ru.job4j.cars.util.AuthUserUtil.setUserGuest;
 
 @Component
 @AllArgsConstructor
-public class AuthFilter implements Filter {
+public class UserSessionFilter implements Filter {
 
     private final UserService userService;
 

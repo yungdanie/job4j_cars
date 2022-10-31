@@ -16,4 +16,8 @@ public class AuthUserUtil {
         session.setAttribute("actual_user", user);
     }
 
+    public static boolean isUserGuest(User user) {
+        return user != null && user.getLogin().equals("Гость");
+    }
+
 }
