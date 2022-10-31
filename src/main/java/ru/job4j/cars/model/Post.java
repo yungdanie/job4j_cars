@@ -21,7 +21,7 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "name")
     private String name;
@@ -35,6 +35,9 @@ public class Post {
 
     @Column(name = "created")
     private LocalDateTime created;
+
+    @Column(name = "sale")
+    private Boolean sale;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
@@ -68,7 +71,7 @@ public class Post {
             return false;
         }
         Post post = (Post) o;
-        return id == post.id;
+        return id.equals(post.id);
     }
 
     @Override

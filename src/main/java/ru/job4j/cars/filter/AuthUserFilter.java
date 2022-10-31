@@ -36,7 +36,7 @@ public class AuthUserFilter implements Filter {
         if (AuthUserUtil.isUserGuest(user)
                 && ACCESS_RESTRICTION.contains(req.getRequestURI())) {
             res.sendRedirect(req.getContextPath() + REDIRECT_LINK);
-        };
+        }
         filterChain.doFilter(servletRequest, servletResponse);
     }
 }
