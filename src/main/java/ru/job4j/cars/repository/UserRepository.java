@@ -36,7 +36,7 @@ public class UserRepository {
         if (!cookie.getName().equals("user_uuid")) {
             throw new IllegalArgumentException("Cookie that used to get User has wrong name");
         }
-        Optional<User> result = repository.tx(session -> {
+        return repository.tx(session -> {
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<User> uuidCriteriaQuery = cb.createQuery(User.class);
             Root<User> userRoot = uuidCriteriaQuery.from(User.class);
@@ -49,7 +49,6 @@ public class UserRepository {
             uuidCriteriaQuery.where(cb.in(userRoot.get("id")).value(subQuery));
             return session.createQuery(uuidCriteriaQuery).uniqueResultOptional();
         });
-        return result;
     }
 
     public User create(User user) {
@@ -58,6 +57,9 @@ public class UserRepository {
     }
 
     public Optional<User> authentication(User user) {
+        if (user == null || user.getLogin() == null || user.getPassword() == null) {
+            return Optional.empty();
+        }
         return repository.getUniqResult("from User u left join fetch u.uuids where login = :login and password = :password",
                 Map.of("login", user.getLogin(), "password", user.getPassword()),
                 User.class);

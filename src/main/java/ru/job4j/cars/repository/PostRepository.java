@@ -19,6 +19,11 @@ public class PostRepository {
 
     private final MainRepository repository;
 
+    public Integer changeSaleToTrue(Integer id) {
+        return repository.tx((Function<Session, Integer>) session ->
+                session.createQuery("update Post set sale = true where id = :id").executeUpdate());
+    }
+
     public List<Post> getAllWithNoEmptyPhoto() {
         return repository.tx(session -> {
             CriteriaBuilder cb = session.getCriteriaBuilder();
@@ -75,10 +80,14 @@ public class PostRepository {
     }
 
     public List<Post> getByTextContains(String key) {
-        return repository.getList("from Post where text like :key", Map.of("key", "%" + key.toLowerCase() + "%"), Post.class);
+        return repository.getList("from Post where text like :key",
+                Map.of("key", "%" + key.toLowerCase() + "%"),
+                Post.class);
     }
 
     public Optional<Post> getById(int id) {
-        return repository.getUniqResult("from Post where id = :id", Map.of("id", id), Post.class);
+        return repository.getUniqResult("from Post where id = :id",
+                Map.of("id", id),
+                Post.class);
     }
 }

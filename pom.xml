@@ -42,6 +42,7 @@
                 <db.password>PASSWORD</db.password>
                 <db.driver>org.postgresql.Driver</db.driver>
                 <liquibase.master>db/master.xml</liquibase.master>
+                <hibernate.dialect>org.hibernate.dialect.PostgreSQL94Dialect</hibernate.dialect>
             </properties>
         </profile>
     </profiles>
@@ -51,6 +52,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <version>2.7.3</version>
         </dependency>
 
         <dependency>
@@ -68,13 +70,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
+            <version>2.7.3</version>
         </dependency>
 
         <dependency>

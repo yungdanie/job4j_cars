@@ -17,4 +17,7 @@ public class PriceHistoryService {
         return priceHistoryRepository.getLastPriceByPostId(postId);
     }
 
+    public PriceHistory save(PriceHistory priceHistory) {
+        return priceHistoryRepository.save(priceHistory);
+    }
 }

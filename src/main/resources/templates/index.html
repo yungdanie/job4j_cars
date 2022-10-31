@@ -45,8 +45,25 @@
     <div class="card">
 
         <div class="card-header">
-            <h3 class="text-left" th:text="${post.getName()}" style="padding-left: 100px"></h3>
+            <div class="row">
+
+                <div class="col-xs" style="width: auto">
+                    <b class="text-left" th:text="${post.getName()}" style="padding: 16px;">Название объявления</b>
+                </div>
+
+            </div>
         </div>
+
+        <div class="card-header" th:if="${post.isSale()}">
+            <div class="row">
+                <div class="col-xs" style="width: 100%; padding: 0 0">
+                    <div class="alert alert-danger" role="alert" style="height: auto; margin: 0 2%; text-align: center">
+                        Объявление уже закрыто
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <div class="card-body" >
             <div class="row">
@@ -69,12 +86,14 @@
                             <div class="row">
                                 <div class="border" style="height: 106px; width: 70%; padding: 5px 20px; text-align: center">
                                     <div class="row">
-                                        <div class="border" style="width: 50%; margin: 5px 5px">
+
+                                        <div class="col border" style="width: auto; margin: 5px 0.5%">
                                             <p th:utext="|Владелец: ${post.getUser().getLogin()}|">
                                                 Владелец:
                                             </p>
                                         </div>
-                                        <div class="border" style="width: 47%; margin: 5px 0;">
+
+                                        <div class="col border" style="width: auto; margin: 5px 0.5%;">
                                             <p th:utext="|Кол-во владельцев: ${post.getParticipates().size()}|">
                                                 Кол-во владельцев:
                                             </p>
@@ -82,7 +101,7 @@
                                     </div>
 
                                     <div class="row">
-                                        <div class="border" style="display: block; margin: 0 auto; width: 95%">
+                                        <div class="border" style="display: block; margin: 0 auto; width: border-box">
                                             <p th:utext="|Дата размещения : ${#temporals.format(post.getCreated(), 'dd-MM-yyyy HH:mm')}|">
                                                 Дата размещения:
                                             </p>
@@ -96,20 +115,19 @@
                                         <div class="row" style="height: auto">
                                             <div class="col">
                                                 <p th:text="|Цена: ${post.getLastPrice()} руб|" class="text-center" style="padding-top: 10px">
-                                                    dd
+                                                    Цена:
                                                 </p>
                                             </div>
                                         </div>
                                         <div class="row" style="height: auto; padding-bottom: 10px ">
                                             <div class="col-xs" >
+                                                <button type="button" class="btn btn-success" th:if="${post.isSale()}" disabled style="display: block; margin: 0 auto; width: 60%">Купить</button>
                                                 <button type="button" class="btn btn-success" style="display: block; margin: 0 auto; width: 60%">Купить</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,6 @@
 package ru.job4j.cars.filter;
 
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.service.UserService;
 import ru.job4j.cars.util.AuthUserUtil;
@@ -17,7 +16,6 @@ import java.util.Optional;
 
 import static ru.job4j.cars.util.AuthUserUtil.setUserGuest;
 
-@Component
 @AllArgsConstructor
 public class UserSessionFilter implements Filter {
 

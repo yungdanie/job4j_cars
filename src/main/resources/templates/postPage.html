@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title>Объявление</title>
+
+</head>
+<body>
+
+<nav class="navbar sticky-top navbar-expand-lg bg-dark">
+    <div class="container-fluid" style="margin: 10px">
+        <a class="navbar-brand text-bold" th:href="@{/index}" style="margin-left: 10px; color: snow; font-size: x-large">
+            <i class="fa-sharp fa-solid fa-house" style="margin-right: 10px"></i>
+            <b>
+                CarSale
+            </b>
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <i class="fa-solid fa-house"></i>
+                </li>
+            </ul>
+        </div>
+        <div class="navbar-nav">
+            <div class="nav-item nav-link" style="margin: 5px">
+                <a class="btn btn-primary btn-light btn-sm" th:href="@{/addPost}" style="color: black; font-size: large">
+                    Добавить объявление
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="card" style="margin: 1% 20%">
+        <div class="card-header" style="text-align: center">
+            <b th:text="${actualPost.getName()}">
+                Объявление
+            </b>
+        </div>
+
+        <div class="card-header" th:if="${actualPost.isSale()}">
+            <div class="alert alert-danger" role="alert" style="height: auto; margin: 0 2%; text-align: center">
+                Объявление уже закрыто
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row" style="padding-top: 1%; padding-bottom: 1%;">
+                <div class="col">
+                    <div class="border" style="width: 250px; height: 250px; margin: 0 auto">
+                        <img th:width="250" th:high="250" th:src="@{|/getPhotoPost/${post.id}|}" style="display: block; margin: 0 auto;"
+                             alt="download...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-top: 1%; padding-bottom: 1%">
+                <div class="col">
+                    <div class="input-group">
+                        <label for="post_name" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Название объявления:</label>
+                        <input type="text" th:value="${actualPost.getName()}" readonly class="form-control" id="post_name" name="post_name">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-top: 1%; padding-bottom: 1%">
+                <div class="col">
+                    <div class="input-group">
+                        <label for="price" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Стоимость:</label>
+                        <input type="number" th:value="${actualPost.getLastPrice()}" readonly min="0" step="50000" id="price" name="price" class="form-control">
+                        <span class="input-group-text">Валюта: ₽ (рубли)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-top: 1%; padding-bottom: 1%">
+                <div class="col">
+                    <div class="input-group">
+                        <label for="post_text" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Описание:</label>
+                        <textarea class="form-control" th:value="${actualPost.getText()}" readonly wrap="soft" rows="3" id="post_text" name="post_text"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-top: 1%; padding-bottom: 1%">
+                <div class="col">
+                    <div class="input-group">
+                        <label for="curr_time" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Время создания:</label>
+                        <input class="form-control" th:value="${#temporals.format(actualPost.getCreated(), 'dd-MM-yyyy HH:mm')}" id="curr_time" name="curr_time" type="datetime-local" disabled="disabled">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-top: 1%; padding-bottom: 1%">
+                <div class="col">
+                    <div class="input-group">
+                        <label for="user" class="form-label" style="padding-top: 5px; padding-right: 10px; width: 25%">Текущий владелец:</label>
+                        <span class="input-group-text">Пользователь</span>
+                        <input type="text" class="form-control" readonly id="user" name="user" th:value="${actualPost.getLogin()}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding-top: 1%; padding-bottom: 1%">
+                <div class="col-xs">
+                    <div class="btn-group" role="group" style="width: 70%; margin: 0 15%">
+                        <a type="button" th:if="${!actualPost.isSale()}" th:href="|changePost/${actualPost.getId()}|" class="btn btn-outline-success">Изменить</a>
+                        <a type="button" th:if="${!actualPost.isSale()}" th:href="|changeSalePost/${actualPost.getId()}|" class="btn btn-outline-primary">Продано</a>
+                        <a type="button" th:href="|deletePost/${actualPost.getId()}|" class="btn btn-outline-danger">Удалить</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p class="mt-5 mb-3 text-muted fixed-bottom text-center">&copy; Daniel Kocheshkov 2022</p>
+</body>
+</html>

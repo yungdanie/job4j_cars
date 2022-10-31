@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -21,6 +22,14 @@ public class PostService {
     private final PostRepository postRepository;
     private final static Logger LOGGER = LoggerFactory.getLogger(PostService.class);
     private static final int DEFAULT_IMAGE_SIZE_BYTES = 13000;
+
+    public Boolean changeSaleToTrue(Integer id) {
+        return postRepository.changeSaleToTrue(id) > 0;
+    }
+
+    public Optional<Post> getById(int id) {
+        return postRepository.getById(id);
+    }
 
     public byte[] getPhoto(int id) {
         var bytes = postRepository.getPhoto(id);
@@ -39,6 +48,10 @@ public class PostService {
 
     public List<Post> getAll() {
         return postRepository.getAll();
+    }
+
+    public Post save(Post post) {
+        return postRepository.save(post);
     }
 
     public List<Post> getAllFetchPriceHAndParticipates() {

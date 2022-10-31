@@ -9,17 +9,18 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "auto_user")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Integer id;
 
     @Column(name = "login")
     private String login;
@@ -33,11 +34,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "uuid_id"))
     private Set<UuidEntity> uuids;
 
-    public User(String login, String password) {
-        this.login = login;
-        this.password = password;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -47,7 +43,7 @@ public class User {
             return false;
         }
         User user = (User) o;
-        return id == user.id && Objects.equals(login, user.login) && Objects.equals(password, user.password);
+        return Objects.equals(id, user.id) && Objects.equals(login, user.login) && Objects.equals(password, user.password);
     }
 
     @Override

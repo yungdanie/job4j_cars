@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.model.UuidEntity;
 import ru.job4j.cars.service.UserService;
@@ -33,6 +34,11 @@ public class UserControl {
     private final static int COOKIE_EXPIRE_TIME = 60 * 60 * 24 * 7;
 
     @GetMapping("/loginUser")
+    public String loginUser() {
+        return "loginPage";
+    }
+
+    @PostMapping("/loginUser")
     public String loginUser(@ModelAttribute User user, Model model, HttpServletRequest req, HttpServletResponse res, HttpSession session) {
         Optional<User> regUser = userService.authentication(user);
         if (regUser.isEmpty()) {
@@ -60,16 +66,23 @@ public class UserControl {
     }
 
     @GetMapping("/registrationUser")
-    public String registrationUser(@ModelAttribute User newUser, Model model, HttpServletRequest req, HttpSession session) {
+    public String registrationUser() {
+        return "regPage";
+    }
+
+    @PostMapping("/registrationUser")
+    public String registrationUser(@ModelAttribute User newUser, Model model, HttpServletRequest req, HttpServletResponse res, HttpSession session) {
         if (userService.checkAuth(newUser)) {
             model.addAttribute(FAIL_REG_MODEL_NAME, true);
             return "regPage";
-        } else {
-            UuidEntity newUuid = new UuidEntity();
-            newUuid.setUserAgent(req.getHeader(USER_AGENT_HEADER));
-            newUser.setUuids(Set.of(newUuid));
-            userService.reg(newUser);
         }
+        UuidEntity newUuid = new UuidEntity();
+        UUID uuid = UUID.randomUUID();
+        newUuid.setUuid(uuid);
+        newUuid.setUserAgent(req.getHeader(USER_AGENT_HEADER));
+        newUser.setUuids(Set.of(newUuid));
+        userService.reg(newUser);
+        CookieUtil.setCookie(res, USER_COOKIE_NAME, uuid.toString(), COOKIE_EXPIRE_TIME);
         session.setAttribute(REG_USER_SESSION_NAME, newUser);
         return "index";
     }

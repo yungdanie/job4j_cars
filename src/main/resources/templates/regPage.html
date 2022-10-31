@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
             integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-    <title>Авторизация</title>
+    <title>Регистрация пользователя</title>
 </head>
 <body>
 
@@ -49,7 +49,7 @@
             </b>
         </div>
 
-        <form th:action="@{/regUser}" method="POST" id="reg_form" name="reg_form">
+        <form th:action="@{/registrationUser}" method="POST" id="reg_form" name="reg_form">
 
             <div class="card-body">
 
@@ -71,7 +71,7 @@
                 <div class="row">
                     <div class="col">
                         <div class="input-group has-validation">
-                            <input type="text" form="reg_form" class="form-control is-invalid" placeholder="Пароль" id="password" name="password" style="margin: 1% auto" required>
+                            <input type="password" form="reg_form" class="form-control is-invalid" placeholder="Пароль" id="password" name="password" style="margin: 1% auto" required>
                             <div id="password_validation" class="invalid-feedback" style="margin: 0px">
                                 Укажите пароль
                             </div>

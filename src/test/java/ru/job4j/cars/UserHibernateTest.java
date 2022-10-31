@@ -7,7 +7,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.job4j.cars.model.Post;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.model.UuidEntity;
 import ru.job4j.cars.repository.MainRepository;

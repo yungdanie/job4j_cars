@@ -12,7 +12,6 @@
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL94Dialect</property>
-        <mapping class="ru.job4j.cars.model.User"/>
         <mapping class="ru.job4j.cars.model.Participates"/>
         <mapping class="ru.job4j.cars.model.Post"/>
         <mapping class="ru.job4j.cars.model.PriceHistory"/>
@@ -21,5 +20,6 @@
         <mapping class="ru.job4j.cars.model.HistoryOwner"/>
         <mapping class="ru.job4j.cars.model.Car"/>
         <mapping class="ru.job4j.cars.model.UuidEntity"/>
+        <mapping class="ru.job4j.cars.model.User"/>
     </session-factory>
 </hibernate-configuration>
