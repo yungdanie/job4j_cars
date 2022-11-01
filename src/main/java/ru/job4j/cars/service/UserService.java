@@ -14,6 +14,10 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    public void annulUuidKey(Integer userId, Cookie cookie) {
+        userRepository.annulUuidKey(userId, cookie);
+    }
+
     public boolean checkAuth(User user) {
         return userRepository.checkAuth(user);
     }

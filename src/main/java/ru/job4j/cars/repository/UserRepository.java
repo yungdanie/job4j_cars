@@ -3,7 +3,10 @@ package ru.job4j.cars.repository;
 
 import lombok.AllArgsConstructor;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import ru.job4j.cars.exceptions.UndefinedCookieException;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.model.UuidEntity;
 
@@ -20,6 +23,10 @@ import java.util.function.Consumer;
 public class UserRepository {
     private final MainRepository repository;
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(UserRepository.class);
+
+    private final static String COOKIE_UUID_NAME = "user_uuid";
+
     public boolean checkAuth(User user) {
         return repository.
                 getUniqResult("from User where login = :login",
@@ -32,8 +39,34 @@ public class UserRepository {
         repository.tx((Consumer<Session>) session -> session.merge(user));
     }
 
+    public void annulUuidKey(Integer userId, Cookie cookie) {
+        if (!cookie.getName().equals(COOKIE_UUID_NAME)) {
+            throw new IllegalArgumentException("Cookie that used to get User has wrong name");
+        }
+        String uuid = cookie.getValue();
+        repository.tx(session -> {
+            User mergedUser = session.get(User.class, userId);
+            if (mergedUser == null) {
+                LOGGER.error("Error in annulUuidKey method. Get User is null");
+                return;
+            }
+            Optional<UuidEntity> uuidEntityToDelete = mergedUser
+                    .getUuids()
+                    .stream()
+                    .filter(streamUuid -> streamUuid.getUuid().toString().equals(uuid)).findFirst();
+            try {
+                if (uuidEntityToDelete.isEmpty()) {
+                    throw new UndefinedCookieException("Cookie to deleted was not attached to User");
+                }
+            } catch (UndefinedCookieException e) {
+                LOGGER.error("Error in annulUuidKey method", e);
+            }
+            session.delete(uuidEntityToDelete.get());
+        });
+    }
+
     public Optional<User> getUserByCookie(Cookie cookie) {
-        if (!cookie.getName().equals("user_uuid")) {
+        if (!cookie.getName().equals(COOKIE_UUID_NAME)) {
             throw new IllegalArgumentException("Cookie that used to get User has wrong name");
         }
         return repository.tx(session -> {

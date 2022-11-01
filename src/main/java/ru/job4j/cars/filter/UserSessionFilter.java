@@ -21,6 +21,10 @@ public class UserSessionFilter implements Filter {
 
     private final UserService userService;
 
+    private static final String SESSION_USER_NAME = "actual_user";
+
+    private static final String COOKIE_UUID_USER_NAME = "user_uuid";
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
@@ -30,13 +34,13 @@ public class UserSessionFilter implements Filter {
         User user = AuthUserUtil.getUser(session);
         Optional<Cookie> cookieOptional = Arrays
                 .stream(cookies)
-                .filter(cookie -> cookie.getName().equals("user_uuid"))
+                .filter(cookie -> cookie.getName().equals(COOKIE_UUID_USER_NAME))
                 .findFirst();
         if (user == null) {
             if (cookieOptional.isPresent()) {
                 Optional<User> loadUser = userService.getUserByCookie(cookieOptional.get());
                 if (loadUser.isPresent()) {
-                    session.setAttribute("actual_user", loadUser.get());
+                    session.setAttribute(SESSION_USER_NAME, loadUser.get());
                 } else {
                     setUserGuest(session);
                 }

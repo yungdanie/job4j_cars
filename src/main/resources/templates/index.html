@@ -30,12 +30,32 @@
                     <i class="fa-solid fa-house"></i>
                 </li>
             </ul>
-        </div>
-        <div class="navbar-nav">
+
             <div class="nav-item nav-link" style="margin: 5px">
                 <a class="btn btn-primary btn-light btn-sm" th:href="@{/addPost}" style="color: black; font-size: large">
                     Добавить объявление
                 </a>
+            </div>
+        </div>
+        <div class="navbar-nav">
+            <div class="nav-item nav-link" style="margin: 5px; width: 100%;">
+
+                <div th:if="${regUser.getId()} == null">
+                    <a class="btn btn-primary btn-light btn-sm" th:href="@{/loginUser}" style="color: black; font-size: large; margin-right: 15px">
+                        Войти
+                    </a>
+
+                    <a class="btn btn-primary btn-light btn-sm" th:href="@{/registrationUser}" style="color: black; font-size: large">
+                        Регистрация
+                    </a>
+                </div>
+
+                <div th:if="${regUser.getId()} != null">
+                    <a class="btn btn-primary btn-light btn-sm" th:href="@{|/logoutUser/${regUser.getId()}|}" style="color: black; font-size: large; margin-right: 15px">
+                        Выйти
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>

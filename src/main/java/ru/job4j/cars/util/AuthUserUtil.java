@@ -37,4 +37,8 @@ public class AuthUserUtil {
         return user == null || user.getLogin().equals(GUEST_USER_NAME);
     }
 
+    public static boolean isUserLogged(User user) {
+        return user.getId() != null;
+    }
+
 }

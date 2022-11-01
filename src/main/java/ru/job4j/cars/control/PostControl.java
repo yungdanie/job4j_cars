@@ -34,6 +34,7 @@ public class PostControl {
 
     private final PostService postService;
 
+
     private final static Logger LOGGER = LoggerFactory.getLogger(PostControl.class);
 
     @GetMapping("/addPost")
@@ -43,7 +44,7 @@ public class PostControl {
     }
 
     @GetMapping("/changeSalePost/{id}")
-    public String changeSalePost(@PathVariable Integer id) {
+    public String changeSalePost(@PathVariable Integer id, Model model, HttpSession session) {
         try {
             if (!postService.changeSaleToTrue(id)) {
                 throw new UndefinedPostException("The post was not found");
@@ -51,18 +52,20 @@ public class PostControl {
         } catch (UndefinedPostException e) {
             LOGGER.error("Error in changeSalePost method", e);
         }
-        return "";
+        AuthUserUtil.addUserToModel(session, model);
+        return "postPage/" + id;
     }
 
     @GetMapping("/postPage/{id}")
-    public String getPostPage(@PathVariable Integer id, HttpSession httpSession, Model model) {
-        AuthUserUtil.addUserToModel(httpSession, model);
+    public String getPostPage(@PathVariable Integer id, HttpSession session, Model model) {
+        AuthUserUtil.addUserToModel(session, model);
         Optional<Post> post = postService.getById(id);
         if (post.isEmpty()) {
             model.addAttribute("errorMessage", "Пост не найден");
             return "redirect:/errorPage";
         }
         model.addAttribute("actualPost", post);
+        AuthUserUtil.addUserToModel(session, model);
         return "postPage";
     }
 

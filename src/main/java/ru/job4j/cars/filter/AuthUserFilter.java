@@ -14,14 +14,18 @@ import java.util.List;
 @AllArgsConstructor
 public class AuthUserFilter implements Filter {
 
-    private static final String GUEST_REDIRECT = "/index";
-
     private static final String SESSION_USER_NAME = "actual_user";
 
-    private static final String REDIRECT_LINK = "/loginUser";
+    private static final String NO_USER_REDIRECT_LINK = "/loginUser";
 
-    private static final List<String> ACCESS_RESTRICTION = List.of(
+    private static final String AUTH_USER_REDIRECT_LINK = "/index";
+
+    private static final List<String> NO_USER_ACCESS_RESTRICTION = List.of(
             "/addPost"
+    );
+
+    private static final List<String> AUTH_USER_ACCESS_RESTRICTION = List.of(
+            "/loginUser", "registrationUser"
     );
 
     @Override
@@ -31,8 +35,11 @@ public class AuthUserFilter implements Filter {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute(SESSION_USER_NAME);
         if (AuthUserUtil.isUserGuestOrNull(user)
-                && ACCESS_RESTRICTION.contains(req.getRequestURI())) {
-            res.sendRedirect(req.getContextPath() + REDIRECT_LINK);
+                && NO_USER_ACCESS_RESTRICTION.contains(req.getRequestURI())) {
+            res.sendRedirect(req.getContextPath() + NO_USER_REDIRECT_LINK);
+        } else if (AuthUserUtil.isUserLogged(user)
+                && AUTH_USER_ACCESS_RESTRICTION.contains(req.getRequestURI())) {
+            res.sendRedirect(req.getContextPath() + AUTH_USER_REDIRECT_LINK);
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
