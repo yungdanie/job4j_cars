@@ -126,6 +126,7 @@
                     <include>**/*.xml</include>
                     <include>**/*.properties</include>
                     <include>**/templates/*.html</include>
+                    <include>**/templates/*/*.html</include>
                 </includes>
             </resource>
         </resources>

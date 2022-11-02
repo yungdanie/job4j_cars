@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 @AllArgsConstructor
 public class AuthUserFilter implements Filter {
@@ -21,12 +22,16 @@ public class AuthUserFilter implements Filter {
     private static final String AUTH_USER_REDIRECT_LINK = "/index";
 
     private static final List<String> NO_USER_ACCESS_RESTRICTION = List.of(
-            "/addPost"
+                "/addPost"
     );
 
     private static final List<String> AUTH_USER_ACCESS_RESTRICTION = List.of(
-            "/loginUser", "registrationUser"
+            "/loginUser", "/registrationUser"
     );
+
+    private List<String> accessRestrictionsParser(Properties properties) {
+
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

@@ -12,4 +12,9 @@ public class CookieUtil {
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
     }
+
+    public static void deleteCookie(Cookie cookie) {
+        cookie.setValue("");
+        cookie.setMaxAge(0);
+    }
 }

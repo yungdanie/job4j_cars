@@ -1,4 +1,4 @@
-package ru.job4j.cars.control;
+package ru.job4j.cars.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 
 @Controller
 @AllArgsConstructor
-public class PriceHistoryControl {
+public class PriceHistoryController {
 
     private final PriceHistoryService priceHistoryService;
 
@@ -23,6 +23,6 @@ public class PriceHistoryControl {
         priceHistory.setPost(post);
         priceHistoryService.save(priceHistory);
         AuthUserUtil.addUserToModel(session, model);
-        return "redirect:/postPage/" + post.getId();
+        return "redirect:post/postPage/" + post.getId();
     }
 }

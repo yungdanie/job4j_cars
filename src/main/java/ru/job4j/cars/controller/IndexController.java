@@ -1,9 +1,10 @@
-package ru.job4j.cars.control;
+package ru.job4j.cars.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.job4j.cars.exception.UndefinedUserException;
 import ru.job4j.cars.service.PostService;
 import ru.job4j.cars.util.AuthUserUtil;
 
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpSession;
 
 @Controller
 @AllArgsConstructor
-public class IndexControl {
+public class IndexController {
 
     private final PostService postService;
 

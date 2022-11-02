@@ -1,4 +1,4 @@
-package ru.job4j.cars.repository.types.custom;
+package ru.job4j.cars.repository.type.custom;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;

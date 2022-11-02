@@ -28,15 +28,16 @@ public class UserSessionFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
-        HttpServletResponse res = (HttpServletResponse) servletResponse;
         HttpSession session = req.getSession();
         Cookie[] cookies = req.getCookies();
         User user = AuthUserUtil.getUser(session);
-        Optional<Cookie> cookieOptional = Arrays
-                .stream(cookies)
-                .filter(cookie -> cookie.getName().equals(COOKIE_UUID_USER_NAME))
-                .findFirst();
-        if (user == null) {
+        if (user != null) {
+            session.setAttribute(SESSION_USER_NAME, user);
+        } else if (cookies != null && cookies.length != 0) {
+            Optional<Cookie> cookieOptional = Arrays
+                    .stream(cookies)
+                    .filter(cookie -> cookie.getName().equals(COOKIE_UUID_USER_NAME))
+                    .findFirst();
             if (cookieOptional.isPresent()) {
                 Optional<User> loadUser = userService.getUserByCookie(cookieOptional.get());
                 if (loadUser.isPresent()) {
@@ -47,6 +48,8 @@ public class UserSessionFilter implements Filter {
             } else {
                 setUserGuest(session);
             }
+        } else {
+            setUserGuest(session);
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }

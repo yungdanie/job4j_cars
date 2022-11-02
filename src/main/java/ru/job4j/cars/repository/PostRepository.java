@@ -19,9 +19,11 @@ public class PostRepository {
 
     private final MainRepository repository;
 
-    public Integer changeSaleToTrue(Integer id) {
-        return repository.tx((Function<Session, Integer>) session ->
-                session.createQuery("update Post set sale = true where id = :id").executeUpdate());
+    public void changeSaleToTrue(Integer id) {
+        repository.tx(session -> {
+            Post post = session.load(Post.class, id);
+            post.setSale(true);
+        });
     }
 
     public List<Post> getAllWithNoEmptyPhoto() {

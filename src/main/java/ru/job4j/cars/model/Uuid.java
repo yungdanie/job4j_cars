@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "uuid")
-public class UuidEntity {
+public class Uuid {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,7 @@ public class UuidEntity {
     private Set<User> users;
 
     @Column(name = "uuid")
-    @Type(type = "ru.job4j.cars.repository.types.custom.UUIDCustomType")
+    @Type(type = "ru.job4j.cars.repository.type.custom.UUIDCustomType")
     private UUID uuid;
 
     @Column(name = "user_agent")
@@ -42,7 +42,7 @@ public class UuidEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        UuidEntity that = (UuidEntity) o;
+        Uuid that = (Uuid) o;
         return Objects.equals(id, that.id);
     }
 

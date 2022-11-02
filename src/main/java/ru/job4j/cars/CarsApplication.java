@@ -4,6 +4,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -11,6 +12,12 @@ import org.springframework.context.annotation.Bean;
 import ru.job4j.cars.filter.AuthUserFilter;
 import ru.job4j.cars.filter.UserSessionFilter;
 import ru.job4j.cars.service.UserService;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 @SpringBootApplication
 public class CarsApplication {
@@ -42,5 +49,17 @@ public class CarsApplication {
         registrationBean.setFilter(userSessionFilter);
         registrationBean.setOrder(0);
         return registrationBean;
+    }
+
+    @Bean
+    @Qualifier("serviceTerms")
+    public Properties serviceTermsMapRegistrationBean() {
+        try (InputStream inStream = CarsApplication.class.getClassLoader().getResourceAsStream("service.terms.properties")) {
+            Properties properties = new Properties();
+            properties.load(inStream);
+            return properties;
+        } catch (IOException e) {
+            throw new RuntimeException("Can not load resource \"service.terms.properties\"", e);
+        }
     }
 }

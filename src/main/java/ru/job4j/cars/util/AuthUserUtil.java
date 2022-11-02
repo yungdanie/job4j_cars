@@ -2,7 +2,7 @@ package ru.job4j.cars.util;
 
 import org.springframework.ui.Model;
 import ru.job4j.cars.model.User;
-import ru.job4j.cars.model.UuidEntity;
+import ru.job4j.cars.model.Uuid;
 
 import javax.servlet.http.HttpSession;
 
@@ -24,7 +24,6 @@ public class AuthUserUtil {
 
     public static void setUserGuest(HttpSession session) {
         User user = new User();
-        UuidEntity uuidEntity = new UuidEntity();
         user.setLogin(GUEST_USER_NAME);
         session.setAttribute(SESSION_USER_NAME, user);
     }

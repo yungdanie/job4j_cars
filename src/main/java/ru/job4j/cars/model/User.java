@@ -32,7 +32,7 @@ public class User {
     @JoinTable(name = "user_uuid",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "uuid_id"))
-    private Set<UuidEntity> uuids;
+    private Set<Uuid> uuids;
 
     @Override
     public boolean equals(Object o) {

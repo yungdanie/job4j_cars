@@ -6,9 +6,9 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import ru.job4j.cars.exceptions.UndefinedCookieException;
+import ru.job4j.cars.exception.UndefinedCookieException;
 import ru.job4j.cars.model.User;
-import ru.job4j.cars.model.UuidEntity;
+import ru.job4j.cars.model.Uuid;
 
 import javax.persistence.criteria.*;
 import javax.servlet.http.Cookie;
@@ -40,17 +40,14 @@ public class UserRepository {
     }
 
     public void annulUuidKey(Integer userId, Cookie cookie) {
-        if (!cookie.getName().equals(COOKIE_UUID_NAME)) {
-            throw new IllegalArgumentException("Cookie that used to get User has wrong name");
-        }
         String uuid = cookie.getValue();
         repository.tx(session -> {
-            User mergedUser = session.get(User.class, userId);
-            if (mergedUser == null) {
+            User actualUser = session.get(User.class, userId);
+            if (actualUser == null) {
                 LOGGER.error("Error in annulUuidKey method. Get User is null");
                 return;
             }
-            Optional<UuidEntity> uuidEntityToDelete = mergedUser
+            Optional<Uuid> uuidEntityToDelete = actualUser
                     .getUuids()
                     .stream()
                     .filter(streamUuid -> streamUuid.getUuid().toString().equals(uuid)).findFirst();
@@ -60,22 +57,20 @@ public class UserRepository {
                 }
             } catch (UndefinedCookieException e) {
                 LOGGER.error("Error in annulUuidKey method", e);
+                return;
             }
             session.delete(uuidEntityToDelete.get());
         });
     }
 
     public Optional<User> getUserByCookie(Cookie cookie) {
-        if (!cookie.getName().equals(COOKIE_UUID_NAME)) {
-            throw new IllegalArgumentException("Cookie that used to get User has wrong name");
-        }
         return repository.tx(session -> {
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<User> uuidCriteriaQuery = cb.createQuery(User.class);
             Root<User> userRoot = uuidCriteriaQuery.from(User.class);
             Subquery<Integer> subQuery = uuidCriteriaQuery.subquery(Integer.class);
             Root<User> subUserRoot = subQuery.from(User.class);
-            Join<User, UuidEntity> subQueryJoin = subUserRoot.join("uuids");
+            Join<User, Uuid> subQueryJoin = subUserRoot.join("uuids");
             subQuery.select(subUserRoot.get("id")).where(
                     cb.equal(subQueryJoin.get("uuid"), UUID.fromString(cookie.getValue()))
             );

@@ -1,4 +1,4 @@
-package ru.job4j.cars.exceptions;
+package ru.job4j.cars.exception;
 
 public class UndefinedUserException extends Exception {
 

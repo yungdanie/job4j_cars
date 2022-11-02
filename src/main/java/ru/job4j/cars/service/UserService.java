@@ -12,9 +12,13 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserService {
 
+    private static final String COOKIE_UUID_NAME = "user_uuid";
     private final UserRepository userRepository;
 
     public void annulUuidKey(Integer userId, Cookie cookie) {
+        if (!cookie.getName().equals(COOKIE_UUID_NAME)) {
+            throw new IllegalArgumentException("Cookie that used to get User has wrong name");
+        }
         userRepository.annulUuidKey(userId, cookie);
     }
 
@@ -23,6 +27,9 @@ public class UserService {
     }
 
     public Optional<User> getUserByCookie(Cookie cookie) {
+        if (!cookie.getName().equals(COOKIE_UUID_NAME)) {
+            throw new IllegalArgumentException("Cookie that used to get User has wrong name");
+        }
         return userRepository.getUserByCookie(cookie);
     }
 

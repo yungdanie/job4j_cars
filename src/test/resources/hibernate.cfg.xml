@@ -19,7 +19,7 @@
         <mapping class="ru.job4j.cars.model.Driver"/>
         <mapping class="ru.job4j.cars.model.HistoryOwner"/>
         <mapping class="ru.job4j.cars.model.Car"/>
-        <mapping class="ru.job4j.cars.model.UuidEntity"/>
+        <mapping class="ru.job4j.cars.model.Uuid"/>
         <mapping class="ru.job4j.cars.model.User"/>
     </session-factory>
 </hibernate-configuration>
