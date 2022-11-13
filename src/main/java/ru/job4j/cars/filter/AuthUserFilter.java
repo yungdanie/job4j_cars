@@ -15,22 +15,22 @@ import java.util.Properties;
 @AllArgsConstructor
 public class AuthUserFilter implements Filter {
 
-    private static final String SESSION_USER_NAME = "actual_user";
+    private final Properties properties;
 
-    private static final String NO_USER_REDIRECT_LINK = "/loginUser";
+    private final String session_user_name = properties.getProperty("SESSION_USER_NAME");
 
-    private static final String AUTH_USER_REDIRECT_LINK = "/index";
+    private  final String no_user_redirect_link = properties.getProperty("NO_USER_REDIRECT_LINK");
 
-    private static final List<String> NO_USER_ACCESS_RESTRICTION = List.of(
-                "/addPost"
-    );
+    private final String auth_user_redirect_link = properties.getProperty("AUTH_USER_REDIRECT_LINK");
 
-    private static final List<String> AUTH_USER_ACCESS_RESTRICTION = List.of(
+    private final List<String> no_user_access_restriction = accessRestrictionsParser(properties.getProperty("NO_USER_ACCESS_RESTRICTION"));
+
+    private final List<String> auth_user_access_restriction = accessRestrictionsParser(properties.getProperty(auth_user_access_restriction));
             "/loginUser", "/registrationUser"
     );
-
-    private List<String> accessRestrictionsParser(Properties properties) {
-
+    
+    private List<String> accessRestrictionsParser(String stringList) {
+        return List.of(stringList.split(","));
     }
 
     @Override
@@ -38,13 +38,13 @@ public class AuthUserFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse res = (HttpServletResponse) servletResponse;
         HttpSession session = req.getSession();
-        User user = (User) session.getAttribute(SESSION_USER_NAME);
+        User user = (User) session.getAttribute(session_user_name);
         if (AuthUserUtil.isUserGuestOrNull(user)
-                && NO_USER_ACCESS_RESTRICTION.contains(req.getRequestURI())) {
-            res.sendRedirect(req.getContextPath() + NO_USER_REDIRECT_LINK);
+                && no_user_access_restriction.contains(req.getRequestURI())) {
+            res.sendRedirect(req.getContextPath() + no_user_redirect_link);
         } else if (AuthUserUtil.isUserLogged(user)
-                && AUTH_USER_ACCESS_RESTRICTION.contains(req.getRequestURI())) {
-            res.sendRedirect(req.getContextPath() + AUTH_USER_REDIRECT_LINK);
+                && auth_user_access_restriction.contains(req.getRequestURI())) {
+            res.sendRedirect(req.getContextPath() + auth_user_redirect_link);
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }

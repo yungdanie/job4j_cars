@@ -15,8 +15,6 @@ import ru.job4j.cars.service.UserService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 @SpringBootApplication
@@ -24,31 +22,6 @@ public class CarsApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(CarsApplication.class);
-    }
-
-    @Bean
-    public SessionFactory sf() {
-        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .configure().build();
-        return new MetadataSources(registry).buildMetadata().buildSessionFactory();
-    }
-
-    @Bean
-    public FilterRegistrationBean<AuthUserFilter> authUserFilterFilterRegistrationBean() {
-        FilterRegistrationBean<AuthUserFilter> registrationBean = new FilterRegistrationBean<>();
-        AuthUserFilter authUserFilter = new AuthUserFilter();
-        registrationBean.setFilter(authUserFilter);
-        registrationBean.setOrder(1);
-        return registrationBean;
-    }
-
-    @Bean
-    public FilterRegistrationBean<UserSessionFilter> userSessionFilterFilterRegistrationBean(UserService userService) {
-        FilterRegistrationBean<UserSessionFilter> registrationBean = new FilterRegistrationBean<>();
-        UserSessionFilter userSessionFilter = new UserSessionFilter(userService);
-        registrationBean.setFilter(userSessionFilter);
-        registrationBean.setOrder(0);
-        return registrationBean;
     }
 
     @Bean
@@ -62,4 +35,31 @@ public class CarsApplication {
             throw new RuntimeException("Can not load resource \"service.terms.properties\"", e);
         }
     }
+
+    @Bean
+    public SessionFactory sf() {
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+                .configure().build();
+        return new MetadataSources(registry).buildMetadata().buildSessionFactory();
+    }
+
+
+    @Bean
+    public FilterRegistrationBean<UserSessionFilter> userSessionFilterFilterRegistrationBean(UserService userService) {
+        FilterRegistrationBean<UserSessionFilter> registrationBean = new FilterRegistrationBean<>();
+        UserSessionFilter userSessionFilter = new UserSessionFilter(userService);
+        registrationBean.setFilter(userSessionFilter);
+        registrationBean.setOrder(0);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<AuthUserFilter> authUserFilterFilterRegistrationBean() {
+        FilterRegistrationBean<AuthUserFilter> registrationBean = new FilterRegistrationBean<>();
+        AuthUserFilter authUserFilter = new AuthUserFilter(serviceTermsMapRegistrationBean());
+        registrationBean.setFilter(authUserFilter);
+        registrationBean.setOrder(1);
+        return registrationBean;
+    }
+
 }
