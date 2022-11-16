@@ -19,7 +19,8 @@ public class PriceHistoryController {
     private final PriceHistoryService priceHistoryService;
 
     @PostMapping("/createPriceHistory")
-    public String createPriceHistory(@ModelAttribute PriceHistory priceHistory, @ModelAttribute Post post, Model model, HttpSession session) {
+    public String createPriceHistory(@ModelAttribute("priceHistory") PriceHistory priceHistory,
+                                     @ModelAttribute("post") Post post, Model model, HttpSession session) {
         priceHistory.setPost(post);
         priceHistoryService.save(priceHistory);
         AuthUserUtil.addUserToModel(session, model);

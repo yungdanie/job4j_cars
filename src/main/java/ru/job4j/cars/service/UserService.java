@@ -1,23 +1,24 @@
 package ru.job4j.cars.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.job4j.cars.exception.RegistrationUserException;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.repository.UserRepository;
 
 import javax.servlet.http.Cookie;
 import java.util.Optional;
-import java.util.Properties;
 
 @Service
 public class UserService {
 
-    private final String cookieUuidName;
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository, @Qualifier("serviceTerms") Properties properties) {
+    private final String cookieUuidName;
+
+    public UserService(UserRepository userRepository, @Value("COOKIE_UUID_NAME") String cookieUuidName) {
         this.userRepository = userRepository;
-        cookieUuidName = properties.getProperty("COOKIE_UUID_NAME");
+        this.cookieUuidName = cookieUuidName;
     }
 
     public void deleteUser(User user) {
@@ -39,8 +40,12 @@ public class UserService {
         return userRepository.getUserByCookie(cookie);
     }
 
-    public User reg(User user) {
-        return userRepository.create(user);
+    public User reg(User user) throws RegistrationUserException {
+        userRepository.create(user);
+        if (user.getId() == null) {
+            throw new RegistrationUserException("User entity was not created");
+        }
+        return user;
     }
 
     public Optional<User> authentication(User user) {

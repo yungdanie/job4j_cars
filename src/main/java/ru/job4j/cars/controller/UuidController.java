@@ -1,21 +1,24 @@
 package ru.job4j.cars.controller;
 
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.job4j.cars.exception.RegistrationUserException;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.model.Uuid;
 import ru.job4j.cars.service.UuidService;
+import ru.job4j.cars.util.CookieUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Properties;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 @Controller
-@AllArgsConstructor
 public class UuidController {
 
     private final UuidService uuidService;
@@ -24,20 +27,47 @@ public class UuidController {
 
     private final String uuidUserCookieName;
 
-    public UuidController(UuidService uuidService, @Qualifier("serviceTerms") Properties properties) {
+    private final String userModelName;
+
+    private final String sessionUserName;
+    private final int cookieExpireTime;
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(UuidController.class);
+
+    public UuidController(UuidService uuidService,
+                          @Value("${USER_AGENT_HEADER}") String userAgentHeader,
+                          @Value("${UUID_USER_COOKIE_NAME}") String uuidUserCookieName,
+                          @Value("${USER_MODEL_NAME}") String userModelName,
+                          @Value("${COOKIE_EXPIRE_TIME}") String cookieExpireTime,
+                          @Value("${SESSION_USER_NAME}") String sessionUserName) {
         this.uuidService = uuidService;
-        userAgentHeader = properties.getProperty("USER_AGENT_HEADER");
-        uuidUserCookieName = properties.getProperty("UUID_USER_COOKIE_NAME");
+        this.userAgentHeader = userAgentHeader;
+        this.uuidUserCookieName = uuidUserCookieName;
+        this.userModelName = userModelName;
+        try {
+            this.cookieExpireTime = Integer.parseInt(cookieExpireTime);
+        } catch (NumberFormatException e) {
+            LOGGER.error("Error initialization Uuid Controller. Cookie expire time has wrong format");
+            throw new RuntimeException("Cookie expire time has wrong format", e);
+        }
+        this.sessionUserName = sessionUserName;
     }
 
-    @PostMapping("/createUuid")
-    public String createUuid(@ModelAttribute User newUser, HttpServletRequest req) {
+    @PostMapping("/regUuid")
+    public String createUuid(@ModelAttribute("user") User user,
+                             HttpServletRequest req,
+                             HttpServletResponse res,
+                             HttpSession session,
+                             Model model) throws RegistrationUserException {
         UUID uuid = UUID.randomUUID();
         Uuid uuidEntity = new Uuid();
         uuidEntity.setUuid(uuid);
-        uuidEntity.setUser(newUser);
+        uuidEntity.setUser(user);
         uuidEntity.setUserAgent(req.getHeader(userAgentHeader));
         uuidService.create(uuidEntity);
-        return "index";
+        CookieUtil.setCookie(res, uuidUserCookieName, uuid.toString(), cookieExpireTime);
+        session.setAttribute(sessionUserName, user);
+        model.addAttribute(userModelName, user);
+        return "redirect:/index";
     }
 }

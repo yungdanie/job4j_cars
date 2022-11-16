@@ -96,7 +96,6 @@ public class UserRepository {
         repository.tx((Consumer<Session>) session -> session.delete(user));
     }
 
-
     public List<User> findAllOrderById() {
         return repository.getList("from User order by id", User.class);
     }

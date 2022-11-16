@@ -1,6 +1,5 @@
 package ru.job4j.cars.filter;
 
-import lombok.AllArgsConstructor;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.util.AuthUserUtil;
 
@@ -10,9 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 
-@AllArgsConstructor
 public class AuthUserFilter implements Filter {
     private final String sessionUserName;
 
@@ -24,15 +21,19 @@ public class AuthUserFilter implements Filter {
 
     private final List<String> authUserAccessRestriction;
 
-    public AuthUserFilter(Properties properties) {
-        noUserAccessRestriction = accessRestrictionsParser(properties.getProperty("NO_USER_ACCESS_RESTRICTION"));
-        authUserAccessRestriction = accessRestrictionsParser(properties.getProperty("AUTH_USER_ACCESS_RESTRICTION"));
-        authUserRedirectLink = properties.getProperty("AUTH_USER_REDIRECT_LINK");
-        noUserRedirectLink = properties.getProperty("NO_USER_REDIRECT_LINK");
-        sessionUserName = properties.getProperty("SESSION_USER_NAME");
+    public AuthUserFilter(String sessionUserName,
+                          String noUserRedirectLink,
+                          String authUserRedirectLink,
+                          String noUserAccessRestriction,
+                          String authUserAccessRestriction) {
+        this.sessionUserName = sessionUserName;
+        this.noUserRedirectLink = noUserRedirectLink;
+        this.authUserRedirectLink = authUserRedirectLink;
+        this.noUserAccessRestriction = stringToListParser(noUserAccessRestriction);
+        this.authUserAccessRestriction = stringToListParser(authUserAccessRestriction);
     }
 
-    private List<String> accessRestrictionsParser(String stringList) {
+    private List<String> stringToListParser(String stringList) {
         return List.of(stringList.split(","));
     }
 

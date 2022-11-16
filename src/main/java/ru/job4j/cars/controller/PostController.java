@@ -27,7 +27,6 @@ import ru.job4j.cars.util.AuthUserUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Optional;
 
 @Controller
 @AllArgsConstructor
@@ -77,8 +76,8 @@ public class PostController {
         }
         post.setPhoto(photo);
         postService.save(post);
-        redirectAttributes.addAttribute("post", post);
-        redirectAttributes.addAttribute("priceHistory", priceHistory);
+        redirectAttributes.addFlashAttribute("post", post);
+        redirectAttributes.addFlashAttribute("priceHistory", priceHistory);
         req.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.TEMPORARY_REDIRECT);
         return "redirect:/createPriceHistory";
     }

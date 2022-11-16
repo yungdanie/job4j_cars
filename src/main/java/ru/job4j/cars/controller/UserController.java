@@ -2,7 +2,7 @@ package ru.job4j.cars.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.job4j.cars.exception.LogoutUserException;
+import ru.job4j.cars.exception.RegistrationUserException;
 import ru.job4j.cars.exception.UndefinedCookieException;
 import ru.job4j.cars.model.User;
-import ru.job4j.cars.model.Uuid;
 import ru.job4j.cars.service.UserService;
 import ru.job4j.cars.util.AuthUserUtil;
 import ru.job4j.cars.util.CookieUtil;
@@ -23,7 +23,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Optional;
 
 @Controller
 public class UserController {
@@ -37,30 +38,15 @@ public class UserController {
     private final String failLoginModelName;
 
     private final String failRegModelName;
-    private final String sessionUserName;
 
-    private final String userModelName;
-
-    private final String userAgentHeader;
-    private final int cookieExpireTime;
-
-    private final String errorPageLink;
-
-    public UserController(UserService userService, @Qualifier("serviceTerms") Properties properties) {
+    public UserController(UserService userService,
+                          @Value("${UUID_USER_COOKIE_NAME}") String uuidUserCookieName,
+                          @Value("${FAIL_LOGIN_MODEL_NAME}") String failLoginModelName,
+                          @Value("${FAIL_REG_MODEL_NAME}") String failRegModelName) {
         this.userService = userService;
-        uuidUserCookieName = properties.getProperty("UUID_USER_COOKIE_NAME");
-        failLoginModelName = properties.getProperty("FAIL_LOGIN_MODEL_NAME");
-        failRegModelName = properties.getProperty("FAIL_REG_MODEL_NAME");
-        sessionUserName = properties.getProperty("SESSION_USER_NAME");
-        userModelName = properties.getProperty("USER_MODEL_NAME");
-        userAgentHeader = properties.getProperty("USER_AGENT_HEADER");
-        errorPageLink = properties.getProperty("ERROR_PAGE_LINK");
-        cookieExpireTime = expireTimeParser(properties.getProperty("COOKIE_EXPIRE_TIME"));
-    }
-
-    private int expireTimeParser(String expireTime) {
-        List<String> nums = List.of(expireTime.split(" "));
-        return nums.stream().map(Integer::valueOf).reduce(1, (x, y) -> x * y);
+        this.uuidUserCookieName = uuidUserCookieName;
+        this.failLoginModelName = failLoginModelName;
+        this.failRegModelName = failRegModelName;
     }
 
     @GetMapping("/loginUser")
@@ -69,23 +55,18 @@ public class UserController {
     }
 
     @PostMapping("/loginUser")
-    public String loginUser(@ModelAttribute User user, Model model, HttpServletRequest req, HttpServletResponse res, HttpSession session) {
+    public String loginUser(@ModelAttribute User user, Model model, HttpServletRequest req,
+                            HttpServletResponse res, HttpSession session,
+                            RedirectAttributes redirectAttributes) {
         Optional<User> regUser = userService.authentication(user);
         if (regUser.isEmpty()) {
             model.addAttribute(failLoginModelName, true);
             return "user/loginPage";
         }
         User detachedUser = regUser.get();
-        String userAgent = req.getHeader(userAgentHeader);
-        Uuid newUuid = new Uuid();
-        newUuid.setUuid(UUID.randomUUID());
-        newUuid.setUserAgent(userAgent);
-        detachedUser.getUuids().add(newUuid);
-        userService.updateUser(detachedUser);
-        CookieUtil.setCookie(res, uuidUserCookieName, newUuid.getUuid().toString(), cookieExpireTime);
-        session.setAttribute(sessionUserName, detachedUser);
-        model.addAttribute(userModelName, detachedUser);
-        return "index";
+        redirectAttributes.addFlashAttribute("user", detachedUser);
+        req.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.TEMPORARY_REDIRECT);
+        return "redirect:/regUuid";
     }
 
     @GetMapping("/registrationUser")
@@ -95,19 +76,15 @@ public class UserController {
 
     @PostMapping("/registrationUser")
     public String registrationUser(@ModelAttribute User newUser, Model model, HttpServletRequest req,
-                                   HttpServletResponse res, HttpSession session,
-                                   RedirectAttributes redirectAttributes) {
+                                   RedirectAttributes redirectAttributes) throws RegistrationUserException {
         if (userService.checkAuth(newUser)) {
             model.addAttribute(failRegModelName, true);
             return "user/regPage";
         }
         userService.reg(newUser);
-        CookieUtil.setCookie(res, uuidUserCookieName, uuid.toString(), cookieExpireTime);
-        session.setAttribute(sessionUserName, newUser);
-        model.addAttribute(userModelName, newUser);
-        redirectAttributes.addAttribute("newUser", newUser);
+        redirectAttributes.addFlashAttribute("user", newUser);
         req.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.TEMPORARY_REDIRECT);
-        return "redirect:/createUuid";
+        return "redirect:/regUuid";
     }
 
     @GetMapping("/logoutUser")

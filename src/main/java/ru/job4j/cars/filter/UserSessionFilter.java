@@ -1,5 +1,6 @@
 package ru.job4j.cars.filter;
 
+import lombok.AllArgsConstructor;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.service.UserService;
 import ru.job4j.cars.util.AuthUserUtil;
@@ -11,10 +12,10 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Properties;
 
 import static ru.job4j.cars.util.AuthUserUtil.setUserGuest;
 
+@AllArgsConstructor
 public class UserSessionFilter implements Filter {
 
     private final UserService userService;
@@ -22,12 +23,6 @@ public class UserSessionFilter implements Filter {
     private final String sessionUserName;
 
     private final String cookieUuidUserName;
-
-    public UserSessionFilter(UserService userService, Properties properties) {
-        this.userService = userService;
-        sessionUserName = properties.getProperty("SESSION_USER_NAME");
-        cookieUuidUserName = properties.getProperty("COOKIE_UUID_USER_NAME");
-    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)

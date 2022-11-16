@@ -1,8 +1,11 @@
 package ru.job4j.cars.service;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.job4j.cars.exception.CreateUuidException;
+import ru.job4j.cars.exception.RegistrationUserException;
 import ru.job4j.cars.model.Uuid;
 import ru.job4j.cars.repository.UuidRepository;
 
@@ -14,13 +17,16 @@ public class UuidService {
 
     private final UserService userService;
 
-    public Uuid create(Uuid uuid) {
-        try {
-            return repository.create(uuid);
-        } catch (CreateUuidException e) {
-            userService.deleteUser(uuid.getUser());
-            return uuid;
+    private final static Logger LOGGER = LoggerFactory.getLogger(UuidService.class);
+
+    public Uuid create(Uuid uuid) throws RegistrationUserException {
+        repository.create(uuid);
+        if (uuid.getId() == null) {
+            LOGGER.error("Error in create uuid method. Uuid entity was not created",
+                    new CreateUuidException("Uuid entity was not created"));
+            throw new RegistrationUserException("User was not created. Try again");
         }
+        return uuid;
     }
 
 }

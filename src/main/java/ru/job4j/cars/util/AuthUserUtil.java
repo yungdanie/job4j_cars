@@ -2,7 +2,6 @@ package ru.job4j.cars.util;
 
 import org.springframework.ui.Model;
 import ru.job4j.cars.model.User;
-import ru.job4j.cars.model.Uuid;
 
 import javax.servlet.http.HttpSession;
 
@@ -33,11 +32,11 @@ public class AuthUserUtil {
     }
 
     public static boolean isUserGuestOrNull(User user) {
-        return user == null || user.getLogin().equals(GUEST_USER_NAME);
+        return user == null || user.getId() == null || user.getLogin().equals(GUEST_USER_NAME);
     }
 
     public static boolean isUserLogged(User user) {
-        return user.getId() != null;
+        return user != null && user.getId() != null;
     }
 
 }
