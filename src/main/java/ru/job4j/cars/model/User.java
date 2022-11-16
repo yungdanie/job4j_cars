@@ -28,10 +28,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_uuid",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "uuid_id"))
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Uuid> uuids;
 
     @Override

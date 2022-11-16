@@ -8,7 +8,6 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -24,8 +23,9 @@ public class Uuid {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToMany(mappedBy = "uuids", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<User> users;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "uuid")
     @Type(type = "ru.job4j.cars.repository.type.custom.UUIDCustomType")
