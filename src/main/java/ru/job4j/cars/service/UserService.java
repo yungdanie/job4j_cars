@@ -1,24 +1,26 @@
 package ru.job4j.cars.service;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.repository.UserRepository;
 
 import javax.servlet.http.Cookie;
 import java.util.Optional;
+import java.util.Properties;
 
 @Service
-@AllArgsConstructor
 public class UserService {
 
-    private static final String COOKIE_UUID_NAME = "user_uuid";
+    private final String cookieUuidName;
     private final UserRepository userRepository;
 
+    public UserService(UserRepository userRepository, @Qualifier("serviceTerms") Properties properties) {
+        this.userRepository = userRepository;
+        cookieUuidName = properties.getProperty("COOKIE_UUID_NAME");
+    }
+
     public void annulUuidKey(Integer userId, Cookie cookie) {
-        if (!cookie.getName().equals(COOKIE_UUID_NAME)) {
-            throw new IllegalArgumentException("Cookie that used to get User has wrong name");
-        }
         userRepository.annulUuidKey(userId, cookie);
     }
 
@@ -27,7 +29,7 @@ public class UserService {
     }
 
     public Optional<User> getUserByCookie(Cookie cookie) {
-        if (!cookie.getName().equals(COOKIE_UUID_NAME)) {
+        if (!cookie.getName().equals(cookieUuidName)) {
             throw new IllegalArgumentException("Cookie that used to get User has wrong name");
         }
         return userRepository.getUserByCookie(cookie);

@@ -14,21 +14,24 @@ import java.util.Properties;
 
 @AllArgsConstructor
 public class AuthUserFilter implements Filter {
+    private final String sessionUserName;
 
-    private final Properties properties;
+    private  final String noUserRedirectLink;
 
-    private final String session_user_name = properties.getProperty("SESSION_USER_NAME");
+    private final String authUserRedirectLink;
 
-    private  final String no_user_redirect_link = properties.getProperty("NO_USER_REDIRECT_LINK");
+    private final List<String> noUserAccessRestriction;
 
-    private final String auth_user_redirect_link = properties.getProperty("AUTH_USER_REDIRECT_LINK");
+    private final List<String> authUserAccessRestriction;
 
-    private final List<String> no_user_access_restriction = accessRestrictionsParser(properties.getProperty("NO_USER_ACCESS_RESTRICTION"));
+    public AuthUserFilter(Properties properties) {
+        noUserAccessRestriction = accessRestrictionsParser(properties.getProperty("NO_USER_ACCESS_RESTRICTION"));
+        authUserAccessRestriction = accessRestrictionsParser(properties.getProperty("AUTH_USER_ACCESS_RESTRICTION"));
+        authUserRedirectLink = properties.getProperty("AUTH_USER_REDIRECT_LINK");
+        noUserRedirectLink = properties.getProperty("NO_USER_REDIRECT_LINK");
+        sessionUserName = properties.getProperty("SESSION_USER_NAME");
+    }
 
-    private final List<String> auth_user_access_restriction = accessRestrictionsParser(properties.getProperty(auth_user_access_restriction));
-            "/loginUser", "/registrationUser"
-    );
-    
     private List<String> accessRestrictionsParser(String stringList) {
         return List.of(stringList.split(","));
     }
@@ -38,13 +41,13 @@ public class AuthUserFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse res = (HttpServletResponse) servletResponse;
         HttpSession session = req.getSession();
-        User user = (User) session.getAttribute(session_user_name);
+        User user = (User) session.getAttribute(sessionUserName);
         if (AuthUserUtil.isUserGuestOrNull(user)
-                && no_user_access_restriction.contains(req.getRequestURI())) {
-            res.sendRedirect(req.getContextPath() + no_user_redirect_link);
+                && noUserAccessRestriction.contains(req.getRequestURI())) {
+            res.sendRedirect(req.getContextPath() + noUserRedirectLink);
         } else if (AuthUserUtil.isUserLogged(user)
-                && auth_user_access_restriction.contains(req.getRequestURI())) {
-            res.sendRedirect(req.getContextPath() + auth_user_redirect_link);
+                && authUserAccessRestriction.contains(req.getRequestURI())) {
+            res.sendRedirect(req.getContextPath() + authUserRedirectLink);
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }

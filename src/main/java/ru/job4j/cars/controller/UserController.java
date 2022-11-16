@@ -1,9 +1,7 @@
 package ru.job4j.cars.controller;
 
-import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.job4j.cars.exception.LogoutUserException;
+import ru.job4j.cars.exception.UndefinedCookieException;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.model.Uuid;
 import ru.job4j.cars.service.UserService;
@@ -24,29 +23,42 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Controller
-@AllArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @Autowired
-    @Qualifier("serviceTerms")
-    private final Map<String, String> serviceTerms;
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
-    private final static String UUID_USER_COOKIE_NAME = "user_uuid";
+    private final String uuidUserCookieName;
 
-    private final static String FAIL_LOGIN_MODEL_NAME = "fail_login";
+    private final String failLoginModelName;
 
-    private final static String FAIL_REG_MODEL_NAME = "fail_reg";
-    private final static String USER_SESSION_NAME = "actual_user";
+    private final String failRegModelName;
+    private final String sessionUserName;
 
-    private final static String USER_MODEL_NAME = "regUser";
+    private final String userModelName;
 
-    private final static String USER_AGENT_HEADER = "user-agent";
-    private final static int COOKIE_EXPIRE_TIME = 60 * 60 * 24 * 7;
+    private final String userAgentHeader;
+    private final int cookieExpireTime;
 
-    private final static String ERROR_PAGE_LINK = "state/errorPage";
+    private final String errorPageLink;
+
+    public UserController(UserService userService, @Qualifier("serviceTerms") Properties properties) {
+        this.userService = userService;
+        uuidUserCookieName = properties.getProperty("UUID_USER_COOKIE_NAME");
+        failLoginModelName = properties.getProperty("FAIL_LOGIN_MODEL_NAME");
+        failRegModelName = properties.getProperty("FAIL_REG_MODEL_NAME");
+        sessionUserName = properties.getProperty("SESSION_USER_NAME");
+        userModelName = properties.getProperty("USER_MODEL_NAME");
+        userAgentHeader = properties.getProperty("USER_AGENT_HEADER");
+        errorPageLink = properties.getProperty("ERROR_PAGE_LINK");
+        cookieExpireTime = expireTimeParser(properties.getProperty("COOKIE_EXPIRE_TIME"));
+    }
+
+    private int expireTimeParser(String expireTime) {
+        List<String> nums = List.of(expireTime.split(" "));
+        return nums.stream().map(Integer::valueOf).reduce(1, (x, y) -> x * y);
+    }
 
     @GetMapping("/loginUser")
     public String loginUser() {
@@ -57,19 +69,19 @@ public class UserController {
     public String loginUser(@ModelAttribute User user, Model model, HttpServletRequest req, HttpServletResponse res, HttpSession session) {
         Optional<User> regUser = userService.authentication(user);
         if (regUser.isEmpty()) {
-            model.addAttribute(FAIL_LOGIN_MODEL_NAME, true);
+            model.addAttribute(failLoginModelName, true);
             return "user/loginPage";
         }
         User detachedUser = regUser.get();
-        String userAgent = req.getHeader(USER_AGENT_HEADER);
+        String userAgent = req.getHeader(userAgentHeader);
         Uuid newUuid = new Uuid();
         newUuid.setUuid(UUID.randomUUID());
         newUuid.setUserAgent(userAgent);
         detachedUser.getUuids().add(newUuid);
         userService.updateUser(detachedUser);
-        CookieUtil.setCookie(res, UUID_USER_COOKIE_NAME, newUuid.getUuid().toString(), COOKIE_EXPIRE_TIME);
-        session.setAttribute(USER_SESSION_NAME, detachedUser);
-        model.addAttribute(USER_MODEL_NAME, detachedUser);
+        CookieUtil.setCookie(res, uuidUserCookieName, newUuid.getUuid().toString(), cookieExpireTime);
+        session.setAttribute(sessionUserName, detachedUser);
+        model.addAttribute(userModelName, detachedUser);
         return "index";
     }
 
@@ -81,36 +93,45 @@ public class UserController {
     @PostMapping("/registrationUser")
     public String registrationUser(@ModelAttribute User newUser, Model model, HttpServletRequest req, HttpServletResponse res, HttpSession session) {
         if (userService.checkAuth(newUser)) {
-            model.addAttribute(FAIL_REG_MODEL_NAME, true);
+            model.addAttribute(failRegModelName, true);
             return "user/regPage";
         }
         Uuid newUuid = new Uuid();
         UUID uuid = UUID.randomUUID();
         newUuid.setUuid(uuid);
-        newUuid.setUserAgent(req.getHeader(USER_AGENT_HEADER));
+        newUuid.setUserAgent(req.getHeader(userAgentHeader));
         newUser.setUuids(Set.of(newUuid));
         userService.reg(newUser);
-        CookieUtil.setCookie(res, UUID_USER_COOKIE_NAME, uuid.toString(), COOKIE_EXPIRE_TIME);
-        session.setAttribute(USER_SESSION_NAME, newUser);
-        model.addAttribute(USER_MODEL_NAME, newUser);
+        CookieUtil.setCookie(res, uuidUserCookieName, uuid.toString(), cookieExpireTime);
+        session.setAttribute(sessionUserName, newUser);
+        model.addAttribute(userModelName, newUser);
         return "index";
     }
 
     @GetMapping("/logoutUser")
-    public String logoutUser(HttpServletRequest req, HttpSession session, Model model) throws LogoutUserException {
+    public String logoutUser(HttpServletRequest req, HttpSession session, Model model) throws LogoutUserException, UndefinedCookieException {
         User sessionUser = AuthUserUtil.getUser(session);
         if (sessionUser == null) {
             LOGGER.error("Error in logoutUser method. Session is not associated with any user");
             throw new LogoutUserException("Session is not associated with any user");
         }
         Optional<Cookie> cookieOptional = Arrays.stream(req.getCookies()).
-                filter(cookie -> cookie.getName().equals(UUID_USER_COOKIE_NAME)).findFirst();
+                filter(cookie -> cookie.getName().equals(uuidUserCookieName)).findFirst();
         if (cookieOptional.isEmpty()) {
             LOGGER.error("Error in logoutUser method. User cookie was not found while logout");
+            throw new UndefinedCookieException("User cookie was not found while logout");
         } else {
             Cookie cookie = cookieOptional.get();
-            userService.annulUuidKey(sessionUser.getId(), cookie);
-            CookieUtil.deleteCookie(cookie);
+            if (sessionUser.getUuids()
+                    .stream()
+                    .anyMatch(uuid -> uuid.getUuid().toString()
+                            .equals(cookie.getValue()))) {
+                userService.annulUuidKey(sessionUser.getId(), cookie);
+                CookieUtil.deleteCookie(cookie);
+            } else {
+                LOGGER.error("Error in logoutUser method. Uuid is not attached to the user");
+                throw new UndefinedCookieException("Uuid is not attached to the user");
+            }
         }
         AuthUserUtil.setUserGuest(session);
         return "redirect:/index";

@@ -6,7 +6,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import ru.job4j.cars.exception.UndefinedCookieException;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.model.Uuid;
 
@@ -47,19 +46,15 @@ public class UserRepository {
                 LOGGER.error("Error in annulUuidKey method. Get User is null");
                 return;
             }
-            Optional<Uuid> uuidEntityToDelete = actualUser
+            Optional<Uuid> uuidEntityDelete = actualUser
                     .getUuids()
                     .stream()
                     .filter(streamUuid -> streamUuid.getUuid().toString().equals(uuid)).findFirst();
-            try {
-                if (uuidEntityToDelete.isEmpty()) {
-                    throw new UndefinedCookieException("Cookie to deleted was not attached to User");
-                }
-            } catch (UndefinedCookieException e) {
-                LOGGER.error("Error in annulUuidKey method", e);
+            if (uuidEntityDelete.isEmpty()) {
+                LOGGER.error("Cookie to deleted was not attached to User");
                 return;
             }
-            session.delete(uuidEntityToDelete.get());
+            session.delete(uuidEntityDelete.get());
         });
     }
 

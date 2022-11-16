@@ -43,11 +43,10 @@ public class CarsApplication {
         return new MetadataSources(registry).buildMetadata().buildSessionFactory();
     }
 
-
     @Bean
     public FilterRegistrationBean<UserSessionFilter> userSessionFilterFilterRegistrationBean(UserService userService) {
         FilterRegistrationBean<UserSessionFilter> registrationBean = new FilterRegistrationBean<>();
-        UserSessionFilter userSessionFilter = new UserSessionFilter(userService);
+        UserSessionFilter userSessionFilter = new UserSessionFilter(userService, serviceTermsMapRegistrationBean());
         registrationBean.setFilter(userSessionFilter);
         registrationBean.setOrder(0);
         return registrationBean;
