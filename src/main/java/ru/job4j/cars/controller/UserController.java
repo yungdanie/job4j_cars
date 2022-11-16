@@ -3,11 +3,14 @@ package ru.job4j.cars.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.job4j.cars.exception.LogoutUserException;
 import ru.job4j.cars.exception.UndefinedCookieException;
 import ru.job4j.cars.model.User;
@@ -91,21 +94,20 @@ public class UserController {
     }
 
     @PostMapping("/registrationUser")
-    public String registrationUser(@ModelAttribute User newUser, Model model, HttpServletRequest req, HttpServletResponse res, HttpSession session) {
+    public String registrationUser(@ModelAttribute User newUser, Model model, HttpServletRequest req,
+                                   HttpServletResponse res, HttpSession session,
+                                   RedirectAttributes redirectAttributes) {
         if (userService.checkAuth(newUser)) {
             model.addAttribute(failRegModelName, true);
             return "user/regPage";
         }
-        Uuid newUuid = new Uuid();
-        UUID uuid = UUID.randomUUID();
-        newUuid.setUuid(uuid);
-        newUuid.setUserAgent(req.getHeader(userAgentHeader));
-        newUser.setUuids(Set.of(newUuid));
         userService.reg(newUser);
         CookieUtil.setCookie(res, uuidUserCookieName, uuid.toString(), cookieExpireTime);
         session.setAttribute(sessionUserName, newUser);
         model.addAttribute(userModelName, newUser);
-        return "index";
+        redirectAttributes.addAttribute("newUser", newUser);
+        req.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.TEMPORARY_REDIRECT);
+        return "redirect:/createUuid";
     }
 
     @GetMapping("/logoutUser")

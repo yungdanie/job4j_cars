@@ -20,6 +20,10 @@ public class UserService {
         cookieUuidName = properties.getProperty("COOKIE_UUID_NAME");
     }
 
+    public void deleteUser(User user) {
+        userRepository.delete(user);
+    }
+
     public void annulUuidKey(Integer userId, Cookie cookie) {
         userRepository.annulUuidKey(userId, cookie);
     }
