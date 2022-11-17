@@ -1,7 +1,10 @@
 package ru.job4j.cars.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.job4j.cars.exception.LogoutUserException;
 import ru.job4j.cars.exception.RegistrationUserException;
 import ru.job4j.cars.model.User;
 import ru.job4j.cars.repository.UserRepository;
@@ -16,7 +19,9 @@ public class UserService {
 
     private final String cookieUuidName;
 
-    public UserService(UserRepository userRepository, @Value("COOKIE_UUID_NAME") String cookieUuidName) {
+    private final static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+
+    public UserService(UserRepository userRepository, @Value("UUID_USER_COOKIE_NAME") String cookieUuidName) {
         this.userRepository = userRepository;
         this.cookieUuidName = cookieUuidName;
     }
@@ -34,18 +39,25 @@ public class UserService {
     }
 
     public Optional<User> getUserByCookie(Cookie cookie) {
-        if (!cookie.getName().equals(cookieUuidName)) {
-            throw new IllegalArgumentException("Cookie that used to get User has wrong name");
-        }
         return userRepository.getUserByCookie(cookie);
     }
 
     public User reg(User user) throws RegistrationUserException {
         userRepository.create(user);
         if (user.getId() == null) {
-            throw new RegistrationUserException("User entity was not created");
+            LOGGER.error("Error in registration User method. User was not created");
+            throw new RegistrationUserException("User was not created");
         }
         return user;
+    }
+
+    public User loadUuids(User user) throws LogoutUserException {
+        Optional<User> loadUser = userRepository.loadUuids(user);
+        if (loadUser.isEmpty()) {
+            LOGGER.trace("Error in loadUuids method. User was not found");
+            throw new LogoutUserException("User was not found");
+        }
+        return loadUser.get();
     }
 
     public Optional<User> authentication(User user) {

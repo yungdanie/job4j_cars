@@ -15,8 +15,8 @@ public class UserAdvice {
 
     private final String errorModelName;
 
-    public UserAdvice(@Value("ERROR_PAGE_LINK") String errorPageLink,
-                      @Value("ERROR_MODEL_NAME") String errorModelName) {
+    public UserAdvice(@Value("${ERROR_PAGE_LINK}") String errorPageLink,
+                      @Value("${ERROR_MODEL_NAME}") String errorModelName) {
         this.errorModelName = errorModelName;
         this.errorPageLink = errorPageLink;
     }

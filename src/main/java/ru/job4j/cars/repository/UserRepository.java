@@ -111,4 +111,12 @@ public class UserRepository {
     public Optional<User> findByLogin(String key) {
         return repository.getUniqResult("from User where login like :key", Map.of("key", key), User.class);
     }
+
+    public Optional<User> loadUuids(User user) {
+        if (user.getId() == null) {
+            LOGGER.error("Error in loadUuids method. User with null key can not be loaded");
+            throw new IllegalArgumentException("User with null key can not be loaded");
+        }
+        return repository.getUniqResult("from User u join fetch u.uuids where u.id = :id", Map.of("id", user.getId()), User.class);
+    }
 }

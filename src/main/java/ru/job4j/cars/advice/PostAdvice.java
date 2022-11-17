@@ -13,8 +13,8 @@ public class PostAdvice {
 
     private final String errorModelName;
 
-    public PostAdvice(@Value("ERROR_PAGE_LINK") String errorPageLink,
-                      @Value("ERROR_MODEL_NAME") String errorModelName) {
+    public PostAdvice(@Value("${ERROR_PAGE_LINK}") String errorPageLink,
+                      @Value("${ERROR_MODEL_NAME}") String errorModelName) {
         this.errorModelName = errorModelName;
         this.errorPageLink = errorPageLink;
     }

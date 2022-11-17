@@ -30,10 +30,10 @@ public class CarsApplication {
     @Bean
     public FilterRegistrationBean<UserSessionFilter>
     userSessionFilterFilterRegistrationBean(UserService userService,
-                                            @Value("SESSION_USER_NAME") String sessionUserName,
-                                            @Value("COOKIE_UUID_USER_NAME") String cookieUuidUserName) {
+                                            @Value("${SESSION_USER_NAME}") String sessionUserName,
+                                            @Value("${UUID_USER_COOKIE_NAME}") String uuidUserCookieName) {
         FilterRegistrationBean<UserSessionFilter> registrationBean = new FilterRegistrationBean<>();
-        UserSessionFilter userSessionFilter = new UserSessionFilter(userService, sessionUserName, cookieUuidUserName);
+        UserSessionFilter userSessionFilter = new UserSessionFilter(userService, sessionUserName, uuidUserCookieName);
         registrationBean.setFilter(userSessionFilter);
         registrationBean.setOrder(0);
         return registrationBean;
@@ -41,11 +41,11 @@ public class CarsApplication {
 
     @Bean
     public FilterRegistrationBean<AuthUserFilter>
-    authUserFilterFilterRegistrationBean(@Value("SESSION_USER_NAME") String sessionUserName,
-                                         @Value("NO_USER_REDIRECT_LINK") String noUserRedirectLink,
-                                         @Value("AUTH_USER_REDIRECT_LINK") String authUserRedirectLink,
-                                         @Value("NO_USER_ACCESS_RESTRICTION") String noUserAccessRestriction,
-                                         @Value("AUTH_USER_ACCESS_RESTRICTION") String authUserAccessRestriction) {
+    authUserFilterFilterRegistrationBean(@Value("${SESSION_USER_NAME}") String sessionUserName,
+                                         @Value("${NO_USER_REDIRECT_LINK}") String noUserRedirectLink,
+                                         @Value("${AUTH_USER_REDIRECT_LINK}") String authUserRedirectLink,
+                                         @Value("${NO_USER_ACCESS_RESTRICTION}") String noUserAccessRestriction,
+                                         @Value("${AUTH_USER_ACCESS_RESTRICTION}") String authUserAccessRestriction) {
         FilterRegistrationBean<AuthUserFilter> registrationBean = new FilterRegistrationBean<>();
         AuthUserFilter authUserFilter = new AuthUserFilter(
                 sessionUserName,

@@ -13,6 +13,7 @@ import ru.job4j.cars.model.Uuid;
 import ru.job4j.cars.service.UuidService;
 import ru.job4j.cars.util.CookieUtil;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -64,10 +65,17 @@ public class UuidController {
         uuidEntity.setUuid(uuid);
         uuidEntity.setUser(user);
         uuidEntity.setUserAgent(req.getHeader(userAgentHeader));
-        uuidService.create(uuidEntity);
+        uuidService.regUuid(uuidEntity);
         CookieUtil.setCookie(res, uuidUserCookieName, uuid.toString(), cookieExpireTime);
         session.setAttribute(sessionUserName, user);
         model.addAttribute(userModelName, user);
+        return "redirect:/index";
+    }
+
+    @PostMapping("/annulUuid")
+    public String annulUuid(@ModelAttribute("cookie") Cookie cookieUuid, @ModelAttribute("uuid") Uuid uuid) {
+        uuidService.annulUuidKey(uuid);
+        CookieUtil.deleteCookie(cookieUuid);
         return "redirect:/index";
     }
 }

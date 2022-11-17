@@ -13,11 +13,10 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.job4j.cars.exception.LogoutUserException;
 import ru.job4j.cars.exception.RegistrationUserException;
-import ru.job4j.cars.exception.UndefinedCookieException;
 import ru.job4j.cars.model.User;
+import ru.job4j.cars.model.Uuid;
 import ru.job4j.cars.service.UserService;
 import ru.job4j.cars.util.AuthUserUtil;
-import ru.job4j.cars.util.CookieUtil;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -39,14 +38,17 @@ public class UserController {
 
     private final String failRegModelName;
 
+    private final String sessionUserName;
     public UserController(UserService userService,
                           @Value("${UUID_USER_COOKIE_NAME}") String uuidUserCookieName,
                           @Value("${FAIL_LOGIN_MODEL_NAME}") String failLoginModelName,
-                          @Value("${FAIL_REG_MODEL_NAME}") String failRegModelName) {
+                          @Value("${FAIL_REG_MODEL_NAME}") String failRegModelName,
+                          @Value("${SESSION_USER_NAME") String sessionUserName) {
         this.userService = userService;
         this.uuidUserCookieName = uuidUserCookieName;
         this.failLoginModelName = failLoginModelName;
         this.failRegModelName = failRegModelName;
+        this.sessionUserName = sessionUserName;
     }
 
     @GetMapping("/loginUser")
@@ -87,32 +89,36 @@ public class UserController {
         return "redirect:/regUuid";
     }
 
-    @GetMapping("/logoutUser")
-    public String logoutUser(HttpServletRequest req, HttpSession session, Model model) throws LogoutUserException, UndefinedCookieException {
+    @PostMapping("/logoutUser")
+    public String logoutUser(HttpServletRequest req, HttpSession session, RedirectAttributes redirectAttributes)
+            throws LogoutUserException {
         User sessionUser = AuthUserUtil.getUser(session);
-        if (sessionUser == null) {
+        if (AuthUserUtil.isUserGuestOrNull(sessionUser)) {
             LOGGER.error("Error in logoutUser method. Session is not associated with any user");
             throw new LogoutUserException("Session is not associated with any user");
         }
+        AuthUserUtil.setUserGuest(session);
         Optional<Cookie> cookieOptional = Arrays.stream(req.getCookies()).
                 filter(cookie -> cookie.getName().equals(uuidUserCookieName)).findFirst();
         if (cookieOptional.isEmpty()) {
-            LOGGER.error("Error in logoutUser method. User cookie was not found while logout");
-            throw new UndefinedCookieException("User cookie was not found while logout");
+            LOGGER.info("Error in logoutUser method. User cookie was not found while logout");
         } else {
+            User loadUser = userService.loadUuids(sessionUser);
             Cookie cookie = cookieOptional.get();
-            if (sessionUser.getUuids()
-                    .stream()
-                    .anyMatch(uuid -> uuid.getUuid().toString()
-                            .equals(cookie.getValue()))) {
-                userService.annulUuidKey(sessionUser.getId(), cookie);
-                CookieUtil.deleteCookie(cookie);
-            } else {
-                LOGGER.error("Error in logoutUser method. Uuid is not attached to the user");
-                throw new UndefinedCookieException("Uuid is not attached to the user");
+            Optional<Uuid> uuid = loadUser.getUuids().
+                    stream()
+                    .filter(uuids -> uuids.getUuid()
+                            .toString()
+                            .equals(cookie.getValue()))
+                    .findFirst();
+            if (uuid.isPresent()) {
+                redirectAttributes.addFlashAttribute("cookie", cookie);
+                redirectAttributes.addFlashAttribute("uuid", uuid.get());
+                req.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.TEMPORARY_REDIRECT);
+                return "redirect:/annulUuid";
             }
+            LOGGER.info("None one uuid was match with user uuids");
         }
-        AuthUserUtil.setUserGuest(session);
         return "redirect:/index";
     }
 }

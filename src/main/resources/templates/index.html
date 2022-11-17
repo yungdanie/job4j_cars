@@ -51,9 +51,9 @@
                 </div>
 
                 <div th:if="${regUser.getId()} != null">
-                    <a class="btn btn-primary btn-light btn-sm" th:href="@{|/logoutUser/${regUser.getId()}|}" style="color: black; font-size: large; margin-right: 15px">
-                        Выйти
-                    </a>
+                    <form th:action="@{/logoutUser}" method="POST" id="logout" name="logout">
+                        <button class="btn btn-primary btn-light btn-sm" type="submit" form="logout" style="color: black; font-size: large; margin-right: 15px;">Выйти</button>
+                    </form>
                 </div>
 
             </div>

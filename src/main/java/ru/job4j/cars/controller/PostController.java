@@ -72,7 +72,7 @@ public class PostController {
         try {
             photo = file.getBytes();
         } catch (IOException e) {
-            LOGGER.error("Photo can not be loaded");
+            LOGGER.info("Photo can not be loaded");
         }
         post.setPhoto(photo);
         postService.save(post);

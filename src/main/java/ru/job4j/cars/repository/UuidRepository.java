@@ -17,4 +17,8 @@ public class UuidRepository {
         mainRepository.tx((Consumer<Session>) session -> session.persist(uuid));
         return uuid;
     }
+
+    public void annulUuidKey(Uuid uuid) {
+        mainRepository.tx((Consumer<Session>) session -> session.delete(uuid));
+    }
 }

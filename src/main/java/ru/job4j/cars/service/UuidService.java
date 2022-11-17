@@ -13,14 +13,14 @@ import ru.job4j.cars.repository.UuidRepository;
 @AllArgsConstructor
 public class UuidService {
 
-    private final UuidRepository repository;
+    private final UuidRepository uuidRepository;
 
     private final UserService userService;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UuidService.class);
 
-    public Uuid create(Uuid uuid) throws RegistrationUserException {
-        repository.create(uuid);
+    public Uuid regUuid(Uuid uuid) throws RegistrationUserException {
+        uuidRepository.create(uuid);
         if (uuid.getId() == null) {
             LOGGER.error("Error in create uuid method. Uuid entity was not created",
                     new CreateUuidException("Uuid entity was not created"));
@@ -28,5 +28,15 @@ public class UuidService {
         }
         return uuid;
     }
+
+    public void annulUuidKey(Uuid uuid) {
+        if (uuid.getId() == null) {
+            LOGGER.info("Uuid was deleted before this");
+            return;
+        }
+        uuidRepository.annulUuidKey(uuid);
+    }
+
+
 
 }
